@@ -4,18 +4,22 @@
 import { useEffect, useState } from "react";
 import { MainLayout } from "./MainLayout";
 import { AuthLayout } from "./AuthLayout";
-import { useAuthStore } from "@/stores/auth";
 
 interface AppLayoutProps {
   children: React.ReactNode;
 }
 
 export function AppLayout({ children }: AppLayoutProps) {
-  const { isAuthenticated } = useAuthStore();
   const [isHydrated, setIsHydrated] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(() => {
-    setIsHydrated(true);
+    // Dynamically import and access store only on client side
+    import("@/stores/auth").then(({ useAuthStore }) => {
+      const authStore = useAuthStore.getState();
+      setIsAuthenticated(authStore.isAuthenticated);
+      setIsHydrated(true);
+    });
   }, []);
 
   // Show loading or default layout during hydration

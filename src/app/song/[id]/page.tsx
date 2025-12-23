@@ -156,32 +156,16 @@ export default function SongDetailPage() {
         <h2 className="text-2xl font-bold text-white">About the Artist</h2>
         <div className="bg-white/5 rounded-lg p-6">
           <div className="flex items-start space-x-4">
-            <Image
-              src={song.artist.avatar || "/placeholder-artist.jpg"}
-              alt={song.artist.name}
-              width={80}
-              height={80}
-              className="w-20 h-20 rounded-full object-cover"
-            />
+            <div className="w-20 h-20 bg-gray-600 rounded-full flex items-center justify-center">
+              <span className="text-white text-2xl font-bold">
+                {song.artist.name.charAt(0).toUpperCase()}
+              </span>
+            </div>
             <div className="flex-1">
-              <h3 className="text-xl font-semibold text-white mb-2">
-                {song.artist.name}
-              </h3>
-              {song.artist.bio && (
-                <p className="text-gray-300 text-sm leading-relaxed">
-                  {song.artist.bio}
-                </p>
-              )}
-              <div className="flex flex-wrap gap-2 mt-3">
-                {song.artist.genres.map((genre: string) => (
-                  <span
-                    key={genre}
-                    className="px-3 py-1 bg-purple-500/20 text-purple-300 rounded-full text-xs"
-                  >
-                    {genre}
-                  </span>
-                ))}
-              </div>
+              <h3 className="text-xl font-semibold text-white mb-2"></h3>
+              <p className="text-gray-300 text-sm">
+                Discover more songs by {song.artist.name}
+              </p>
             </div>
           </div>
         </div>
