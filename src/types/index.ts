@@ -53,7 +53,7 @@ export interface HistoryItem {
   userId: string;
   songId: string;
   song: Song;
-  action: 'PLAY' | 'SKIP' | 'LIKE';
+  action: "PLAY" | "SKIP" | "LIKE";
   duration: number; // seconds played
   playedAt: string;
 }

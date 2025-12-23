@@ -1,13 +1,20 @@
 // src/components/player/MusicPlayer.tsx
-'use client';
+"use client";
 
-import { useEffect, useRef, useState } from 'react';
-import { Play, Pause, SkipBack, SkipForward, Volume2, VolumeX } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Slider } from '@/components/ui/slider';
-import { usePlayerStore } from '@/stores/player';
-import { historyApi } from '@/api/history';
-import Image from 'next/image';
+import { useEffect, useRef, useState } from "react";
+import {
+  Play,
+  Pause,
+  SkipBack,
+  SkipForward,
+  Volume2,
+  VolumeX,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Slider } from "@/components/ui/slider";
+import { usePlayerStore } from "@/stores/player";
+import { historyApi } from "@/api/history";
+import Image from "next/image";
 
 export function MusicPlayer() {
   const {
@@ -46,24 +53,24 @@ export function MusicPlayer() {
         try {
           await historyApi.addHistory({
             songId: currentSong.id,
-            action: 'PLAY',
+            action: "PLAY",
             duration: Math.floor(audio.duration),
           });
         } catch (error) {
-          console.error('Failed to track play history:', error);
+          console.error("Failed to track play history:", error);
         }
       }
       nextSong();
     };
 
-    audio.addEventListener('loadedmetadata', handleLoadedMetadata);
-    audio.addEventListener('timeupdate', handleTimeUpdate);
-    audio.addEventListener('ended', handleEnded);
+    audio.addEventListener("loadedmetadata", handleLoadedMetadata);
+    audio.addEventListener("timeupdate", handleTimeUpdate);
+    audio.addEventListener("ended", handleEnded);
 
     return () => {
-      audio.removeEventListener('loadedmetadata', handleLoadedMetadata);
-      audio.removeEventListener('timeupdate', handleTimeUpdate);
-      audio.removeEventListener('ended', handleEnded);
+      audio.removeEventListener("loadedmetadata", handleLoadedMetadata);
+      audio.removeEventListener("timeupdate", handleTimeUpdate);
+      audio.removeEventListener("ended", handleEnded);
     };
   }, [currentSong, setDuration, setCurrentTime, nextSong]);
 
@@ -119,7 +126,7 @@ export function MusicPlayer() {
   const formatTime = (time: number) => {
     const minutes = Math.floor(time / 60);
     const seconds = Math.floor(time % 60);
-    return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+    return `${minutes}:${seconds.toString().padStart(2, "0")}`;
   };
 
   if (!currentSong) {
@@ -134,15 +141,19 @@ export function MusicPlayer() {
         {/* Song Info */}
         <div className="flex items-center space-x-3 min-w-0 flex-1">
           <Image
-            src={currentSong.artworkUrl || '/placeholder-album.jpg'}
+            src={currentSong.artworkUrl || "/placeholder-album.jpg"}
             alt={currentSong.title}
             width={48}
             height={48}
             className="w-12 h-12 rounded object-cover"
           />
           <div className="min-w-0 flex-1">
-            <p className="text-white font-medium truncate">{currentSong.title}</p>
-            <p className="text-gray-400 text-sm truncate">{currentSong.artist.name}</p>
+            <p className="text-white font-medium truncate">
+              {currentSong.title}
+            </p>
+            <p className="text-gray-400 text-sm truncate">
+              {currentSong.artist.name}
+            </p>
           </div>
         </div>
 

@@ -59,22 +59,26 @@ src/
 ### Installation
 
 1. Clone the repository:
+
 ```bash
 git clone <repository-url>
 cd paravibe-fe
 ```
 
 2. Install dependencies:
+
 ```bash
 npm install
 ```
 
 3. Copy environment variables:
+
 ```bash
 cp .env.example .env.local
 ```
 
 4. Start the development server:
+
 ```bash
 npm run dev
 ```
@@ -97,6 +101,7 @@ NEXT_PUBLIC_AI_API_BASE_URL=http://localhost:8000/api/v1
 The frontend integrates with two backend services:
 
 ### Main API (`http://localhost:8080/api/v1`)
+
 - Authentication (`/auth/*`)
 - Songs (`/songs/*`)
 - Artists (`/artists/*`)
@@ -104,6 +109,7 @@ The frontend integrates with two backend services:
 - History (`/users/*/history`)
 
 ### AI Service (`http://localhost:8000/api/v1`)
+
 - Recommendations (`/recommendations/*`)
 
 ## 🎨 UI/UX Design
@@ -157,6 +163,7 @@ npm start
 ### Environment Setup
 
 Ensure your production environment has:
+
 - Backend API endpoints configured
 - Proper CORS settings
 - HTTPS enabled for security

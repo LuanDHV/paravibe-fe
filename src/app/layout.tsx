@@ -1,8 +1,8 @@
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
-import { Providers } from '@/components/providers/Providers';
-import { AppLayout } from '@/components/layout/AppLayout';
+import { Providers } from "@/components/providers/Providers";
+import { AppLayout } from "@/components/layout/AppLayout";
 import "./globals.css";
 
 const inter = Inter({
@@ -22,7 +22,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="dark">
-      <body className={`${inter.variable} font-sans antialiased bg-background text-foreground`}>
+      <body
+        className={`${inter.variable} font-sans antialiased bg-background text-foreground`}
+      >
         <Providers>
           <AppLayout>{children}</AppLayout>
         </Providers>

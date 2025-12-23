@@ -1,13 +1,13 @@
 // src/components/layout/Header.tsx
-'use client';
+"use client";
 
-import { Search, Menu, User } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { useAuthStore } from '@/stores/auth';
-import { useAppStore } from '@/stores/app';
-import { useRouter } from 'next/navigation';
+import { Search, Menu, User } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { useAuthStore } from "@/stores/auth";
+import { useAppStore } from "@/stores/app";
+import { useRouter } from "next/navigation";
 
 export function Header() {
   const { user, logout } = useAuthStore();
@@ -17,13 +17,13 @@ export function Header() {
   const handleSearch = (query: string) => {
     setSearchQuery(query);
     if (query.trim()) {
-      router.push('/search');
+      router.push("/search");
     }
   };
 
   const handleLogout = () => {
     logout();
-    router.push('/login');
+    router.push("/login");
   };
 
   return (
@@ -43,7 +43,9 @@ export function Header() {
           <Input
             placeholder="Search songs, artists..."
             className="pl-10"
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleSearch(e.target.value)}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+              handleSearch(e.target.value)
+            }
           />
         </div>
       </div>
@@ -63,7 +65,7 @@ export function Header() {
             </Button>
           </div>
         ) : (
-          <Button variant="ghost" onClick={() => router.push('/login')}>
+          <Button variant="ghost" onClick={() => router.push("/login")}>
             <User className="mr-2 h-4 w-4" />
             Sign In
           </Button>

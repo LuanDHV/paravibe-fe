@@ -1,7 +1,7 @@
 // src/stores/auth.ts
-import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
-import { User, AuthTokens } from '@/types';
+import { create } from "zustand";
+import { persist } from "zustand/middleware";
+import { User, AuthTokens } from "@/types";
 
 interface AuthState {
   user: User | null;
@@ -41,7 +41,8 @@ export const useAuthStore = create<AuthState>()(
           isLoading: false,
         });
         // Clear cookie
-        document.cookie = 'auth-token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
+        document.cookie =
+          "auth-token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
       },
 
       updateUser: (updates: Partial<User>) => {
@@ -56,7 +57,7 @@ export const useAuthStore = create<AuthState>()(
       },
     }),
     {
-      name: 'auth-storage',
+      name: "auth-storage",
       partialize: (state) => ({
         user: state.user,
         tokens: state.tokens,

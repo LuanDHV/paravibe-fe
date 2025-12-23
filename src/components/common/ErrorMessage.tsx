@@ -1,5 +1,5 @@
 // src/components/common/ErrorMessage.tsx
-import { AlertCircle } from 'lucide-react';
+import { AlertCircle } from "lucide-react";
 
 interface ErrorMessageProps {
   message: string;
@@ -12,7 +12,9 @@ export function ErrorMessage({ message, onRetry }: ErrorMessageProps) {
       <div className="text-center space-y-4">
         <AlertCircle className="w-12 h-12 text-red-500 mx-auto" />
         <div>
-          <h3 className="text-lg font-medium text-white mb-2">Something went wrong</h3>
+          <h3 className="text-lg font-medium text-white mb-2">
+            Something went wrong
+          </h3>
           <p className="text-gray-400">{message}</p>
         </div>
         {onRetry && (

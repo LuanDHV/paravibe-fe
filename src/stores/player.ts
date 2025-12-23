@@ -1,6 +1,6 @@
 // src/stores/player.ts
-import { create } from 'zustand';
-import { Song, PlayerState } from '@/types';
+import { create } from "zustand";
+import { Song, PlayerState } from "@/types";
 
 interface PlayerActions {
   setCurrentSong: (song: Song | null) => void;
@@ -106,7 +106,7 @@ export const usePlayerStore = create<PlayerStore>((set, get) => ({
 
   playSong: (song: Song) => {
     const { queue } = get();
-    const existingIndex = queue.findIndex(s => s.id === song.id);
+    const existingIndex = queue.findIndex((s) => s.id === song.id);
 
     if (existingIndex !== -1) {
       // Song already in queue, play it

@@ -1,12 +1,12 @@
 // src/components/common/SongCard.tsx
-'use client';
+"use client";
 
-import Image from 'next/image';
-import { Play, Pause } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Song } from '@/types';
-import { usePlayerStore } from '@/stores/player';
-import { historyApi } from '@/api/history';
+import Image from "next/image";
+import { Play, Pause } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Song } from "@/types";
+import { usePlayerStore } from "@/stores/player";
+import { historyApi } from "@/api/history";
 
 interface SongCardProps {
   song: Song;
@@ -28,11 +28,11 @@ export function SongCard({ song, showPlayButton = true }: SongCardProps) {
       try {
         await historyApi.addHistory({
           songId: song.id,
-          action: 'PLAY',
+          action: "PLAY",
           duration: 0, // Will be updated when song ends
         });
       } catch (error) {
-        console.error('Failed to track play history:', error);
+        console.error("Failed to track play history:", error);
       }
     }
   };
@@ -41,7 +41,7 @@ export function SongCard({ song, showPlayButton = true }: SongCardProps) {
     <div className="group bg-white/5 hover:bg-white/10 rounded-lg p-4 transition-colors cursor-pointer">
       <div className="relative mb-3">
         <Image
-          src={song.artworkUrl || '/placeholder-album.jpg'}
+          src={song.artworkUrl || "/placeholder-album.jpg"}
           alt={song.title}
           width={160}
           height={160}

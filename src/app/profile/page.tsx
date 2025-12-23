@@ -1,27 +1,31 @@
 // src/app/profile/page.tsx
-'use client';
+"use client";
 
-import { useQuery } from '@tanstack/react-query';
-import { Calendar, Clock, Music, TrendingUp } from 'lucide-react';
-import { useAuthStore } from '@/stores/auth';
-import { historyApi } from '@/api/history';
-import { playlistsApi } from '@/api/playlists';
-import { LoadingSpinner } from '@/components/common/LoadingSpinner';
-import { ErrorMessage } from '@/components/common/ErrorMessage';
-import { SongCard } from '@/components/common/SongCard';
+import { useQuery } from "@tanstack/react-query";
+import { Calendar, Clock, Music, TrendingUp } from "lucide-react";
+import { useAuthStore } from "@/stores/auth";
+import { historyApi } from "@/api/history";
+import { playlistsApi } from "@/api/playlists";
+import { LoadingSpinner } from "@/components/common/LoadingSpinner";
+import { ErrorMessage } from "@/components/common/ErrorMessage";
+import { SongCard } from "@/components/common/SongCard";
 
 export default function ProfilePage() {
   const { user } = useAuthStore();
 
-  const { data: history, isLoading: historyLoading, error: historyError } = useQuery({
-    queryKey: ['user-history', user?.id],
-    queryFn: () => user ? historyApi.getUserHistory(user.id) : [],
+  const {
+    data: history,
+    isLoading: historyLoading,
+    error: historyError,
+  } = useQuery({
+    queryKey: ["user-history", user?.id],
+    queryFn: () => (user ? historyApi.getUserHistory(user.id) : []),
     enabled: !!user,
   });
 
   const { data: playlists, isLoading: playlistsLoading } = useQuery({
-    queryKey: ['user-playlists', user?.id],
-    queryFn: () => user ? playlistsApi.getUserPlaylists(user.id) : [],
+    queryKey: ["user-playlists", user?.id],
+    queryFn: () => (user ? playlistsApi.getUserPlaylists(user.id) : []),
     enabled: !!user,
   });
 
@@ -38,9 +42,10 @@ export default function ProfilePage() {
   }
 
   // Calculate stats
-  const totalPlays = history?.filter(h => h.action === 'PLAY').length || 0;
-  const uniqueSongs = new Set(history?.map(h => h.songId)).size || 0;
-  const totalListeningTime = history?.reduce((acc, h) => acc + h.duration, 0) || 0;
+  const totalPlays = history?.filter((h) => h.action === "PLAY").length || 0;
+  const uniqueSongs = new Set(history?.map((h) => h.songId)).size || 0;
+  const totalListeningTime =
+    history?.reduce((acc, h) => acc + h.duration, 0) || 0;
 
   const formatDuration = (seconds: number) => {
     const hours = Math.floor(seconds / 3600);
@@ -49,10 +54,12 @@ export default function ProfilePage() {
   };
 
   const recentSongs = history
-    ?.filter(h => h.action === 'PLAY')
-    .sort((a, b) => new Date(b.playedAt).getTime() - new Date(a.playedAt).getTime())
+    ?.filter((h) => h.action === "PLAY")
+    .sort(
+      (a, b) => new Date(b.playedAt).getTime() - new Date(a.playedAt).getTime()
+    )
     .slice(0, 6)
-    .map(h => h.song);
+    .map((h) => h.song);
 
   return (
     <div className="space-y-8">
@@ -66,7 +73,9 @@ export default function ProfilePage() {
             </span>
           </div>
           <div>
-            <h2 className="text-2xl font-semibold text-white">{user.username}</h2>
+            <h2 className="text-2xl font-semibold text-white">
+              {user.username}
+            </h2>
             <p className="text-gray-400">{user.email}</p>
             <p className="text-sm text-gray-500">
               Member since {new Date(user.createdAt).toLocaleDateString()}
@@ -91,13 +100,17 @@ export default function ProfilePage() {
 
         <div className="bg-white/5 rounded-lg p-6 text-center">
           <Clock className="w-8 h-8 text-blue-400 mx-auto mb-2" />
-          <div className="text-2xl font-bold text-white">{formatDuration(totalListeningTime)}</div>
+          <div className="text-2xl font-bold text-white">
+            {formatDuration(totalListeningTime)}
+          </div>
           <div className="text-sm text-gray-400">Listening Time</div>
         </div>
 
         <div className="bg-white/5 rounded-lg p-6 text-center">
           <Calendar className="w-8 h-8 text-pink-400 mx-auto mb-2" />
-          <div className="text-2xl font-bold text-white">{playlists?.length || 0}</div>
+          <div className="text-2xl font-bold text-white">
+            {playlists?.length || 0}
+          </div>
           <div className="text-sm text-gray-400">Playlists</div>
         </div>
       </div>
@@ -126,7 +139,7 @@ export default function ProfilePage() {
           {history && history.length > 0 ? (
             Object.entries(
               history
-                .filter(h => h.action === 'PLAY')
+                .filter((h) => h.action === "PLAY")
                 .reduce((acc, h) => {
                   acc[h.song.genre] = (acc[h.song.genre] || 0) + 1;
                   return acc;

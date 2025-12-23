@@ -1,30 +1,41 @@
 // src/app/playlists/page.tsx
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
-import Link from 'next/link';
-import { Plus } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { playlistsApi } from '@/api/playlists';
-import { LoadingSpinner } from '@/components/common/LoadingSpinner';
-import { ErrorMessage } from '@/components/common/ErrorMessage';
-import { useAuthStore } from '@/stores/auth';
+import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import Link from "next/link";
+import { Plus } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { playlistsApi } from "@/api/playlists";
+import { LoadingSpinner } from "@/components/common/LoadingSpinner";
+import { ErrorMessage } from "@/components/common/ErrorMessage";
+import { useAuthStore } from "@/stores/auth";
 
 export default function PlaylistsPage() {
   const { user } = useAuthStore();
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [newPlaylist, setNewPlaylist] = useState({
-    name: '',
-    description: '',
+    name: "",
+    description: "",
   });
 
-  const { data: playlists, isLoading, error, refetch } = useQuery({
-    queryKey: ['user-playlists', user?.id],
-    queryFn: () => user ? playlistsApi.getUserPlaylists(user.id) : [],
+  const {
+    data: playlists,
+    isLoading,
+    error,
+    refetch,
+  } = useQuery({
+    queryKey: ["user-playlists", user?.id],
+    queryFn: () => (user ? playlistsApi.getUserPlaylists(user.id) : []),
     enabled: !!user,
   });
 
@@ -37,11 +48,11 @@ export default function PlaylistsPage() {
         description: newPlaylist.description,
         isPublic: false,
       });
-      setNewPlaylist({ name: '', description: '' });
+      setNewPlaylist({ name: "", description: "" });
       setIsCreateDialogOpen(false);
       refetch();
     } catch (error) {
-      console.error('Failed to create playlist:', error);
+      console.error("Failed to create playlist:", error);
     }
   };
 
@@ -59,7 +70,9 @@ export default function PlaylistsPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold text-white">Your Playlists</h1>
-          <p className="text-gray-400 mt-1">Create and manage your music collections</p>
+          <p className="text-gray-400 mt-1">
+            Create and manage your music collections
+          </p>
         </div>
 
         <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
@@ -78,24 +91,42 @@ export default function PlaylistsPage() {
                 <label className="text-sm font-medium">Name</label>
                 <Input
                   value={newPlaylist.name}
-                  onChange={(e) => setNewPlaylist(prev => ({ ...prev, name: e.target.value }))}
+                  onChange={(e) =>
+                    setNewPlaylist((prev) => ({
+                      ...prev,
+                      name: e.target.value,
+                    }))
+                  }
                   placeholder="My Awesome Playlist"
                 />
               </div>
               <div>
-                <label className="text-sm font-medium">Description (optional)</label>
+                <label className="text-sm font-medium">
+                  Description (optional)
+                </label>
                 <Textarea
                   value={newPlaylist.description}
-                  onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setNewPlaylist(prev => ({ ...prev, description: e.target.value }))}
+                  onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
+                    setNewPlaylist((prev) => ({
+                      ...prev,
+                      description: e.target.value,
+                    }))
+                  }
                   placeholder="A collection of my favorite songs..."
                   rows={3}
                 />
               </div>
               <div className="flex justify-end space-x-2">
-                <Button variant="outline" onClick={() => setIsCreateDialogOpen(false)}>
+                <Button
+                  variant="outline"
+                  onClick={() => setIsCreateDialogOpen(false)}
+                >
                   Cancel
                 </Button>
-                <Button onClick={handleCreatePlaylist} disabled={!newPlaylist.name.trim()}>
+                <Button
+                  onClick={handleCreatePlaylist}
+                  disabled={!newPlaylist.name.trim()}
+                >
                   Create
                 </Button>
               </div>
@@ -138,8 +169,12 @@ export default function PlaylistsPage() {
       ) : (
         <div className="text-center py-12">
           <Plus className="w-12 h-12 text-gray-600 mx-auto mb-4" />
-          <h3 className="text-lg font-medium text-white mb-2">No playlists yet</h3>
-          <p className="text-gray-400 mb-6">Create your first playlist to get started</p>
+          <h3 className="text-lg font-medium text-white mb-2">
+            No playlists yet
+          </h3>
+          <p className="text-gray-400 mb-6">
+            Create your first playlist to get started
+          </p>
           <Button onClick={() => setIsCreateDialogOpen(true)}>
             <Plus className="w-5 h-5 mr-2" />
             Create Your First Playlist

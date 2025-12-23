@@ -1,9 +1,9 @@
 // src/components/common/RecommendationSection.tsx
-'use client';
+"use client";
 
-import { Recommendation } from '@/types';
-import { SongCard } from './SongCard';
-import { Star } from 'lucide-react';
+import { Recommendation } from "@/types";
+import { SongCard } from "./SongCard";
+import { Star } from "lucide-react";
 
 interface RecommendationSectionProps {
   title: string;
@@ -14,7 +14,7 @@ interface RecommendationSectionProps {
 export function RecommendationSection({
   title,
   subtitle,
-  recommendations
+  recommendations,
 }: RecommendationSectionProps) {
   return (
     <section className="space-y-4">
