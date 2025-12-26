@@ -28,7 +28,7 @@ export function AppLayout({ children }: AppLayoutProps) {
 
     const refreshInterval = setInterval(async () => {
       if (isRefreshing) return;
-      
+
       setIsRefreshing(true);
       try {
         const newTokens = await authApi.refresh(tokens.refreshToken);

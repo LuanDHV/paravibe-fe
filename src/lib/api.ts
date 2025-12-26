@@ -60,16 +60,16 @@ api.interceptors.response.use(
           // Refresh failed, logout user
           logout();
           // Use Next.js router instead of window.location for better UX
-          if (typeof window !== 'undefined') {
-            window.location.href = '/login';
+          if (typeof window !== "undefined") {
+            window.location.href = "/login";
           }
           return Promise.reject(refreshError);
         }
       } else {
         // No refresh token, logout immediately
         logout();
-        if (typeof window !== 'undefined') {
-          window.location.href = '/login';
+        if (typeof window !== "undefined") {
+          window.location.href = "/login";
         }
       }
     }
