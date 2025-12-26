@@ -141,7 +141,7 @@ export function MusicPlayer() {
         {/* Song Info */}
         <div className="flex items-center space-x-3 min-w-0 flex-1">
           <Image
-            src={currentSong.artworkUrl || "/placeholder-album.jpg"}
+            src={currentSong.imageUrl || "/placeholder-album.jpg"}
             alt={currentSong.title}
             width={48}
             height={48}
