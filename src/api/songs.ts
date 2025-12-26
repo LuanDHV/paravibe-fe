@@ -34,7 +34,7 @@ export const songsApi = {
     limit: number = 20
   ): Promise<Song[]> => {
     const response = await api.get<ApiResponse<Song[]>>(
-      `/users/${userId}/recently-played`,
+      `/users/${userId}/history`,
       {
         params: { limit },
       }
