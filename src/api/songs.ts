@@ -26,7 +26,7 @@ export const songsApi = {
     const response = await api.get<ApiResponse<Song[]>>("/songs/trending", {
       params: { limit },
     });
-    return response.data.data;
+    return response.data.data || [];
   },
 
   getRecentlyPlayed: async (
@@ -39,6 +39,6 @@ export const songsApi = {
         params: { limit },
       }
     );
-    return response.data.data;
+    return response.data.data || [];
   },
 };

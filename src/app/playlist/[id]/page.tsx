@@ -120,7 +120,7 @@ export default function PlaylistDetailPage() {
                 <div className="w-8 text-center text-gray-400">{index + 1}</div>
 
                 <Image
-                  src={song.artworkUrl || "/placeholder-album.jpg"}
+                  src={song.imageUrl || "/placeholder-album.jpg"}
                   alt={song.title}
                   width={48}
                   height={48}

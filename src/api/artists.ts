@@ -25,6 +25,6 @@ export const artistsApi = {
     const response = await api.get<ApiResponse<Artist[]>>("/artists/top", {
       params: { limit },
     });
-    return response.data.data;
+    return response.data.data || [];
   },
 };

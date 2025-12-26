@@ -51,7 +51,7 @@ export default function SearchPage() {
   const handleFilterChange = (key: keyof SearchFilters, value: string) => {
     setFilters((prev) => ({
       ...prev,
-      [key]: value || undefined,
+      [key]: value === "all" ? undefined : value,
     }));
   };
 
@@ -84,7 +84,7 @@ export default function SearchPage() {
               <SelectValue placeholder="Genre" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">All Genres</SelectItem>
+              <SelectItem value="all">All Genres</SelectItem>
               <SelectItem value="pop">Pop</SelectItem>
               <SelectItem value="rock">Rock</SelectItem>
               <SelectItem value="hip-hop">Hip Hop</SelectItem>
@@ -103,7 +103,7 @@ export default function SearchPage() {
               <SelectValue placeholder="Artist" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">All Artists</SelectItem>
+              <SelectItem value="all">All Artists</SelectItem>
               {/* Will populate with actual artists later */}
             </SelectContent>
           </Select>
@@ -125,7 +125,9 @@ export default function SearchPage() {
         <LoadingSpinner />
       ) : error ? (
         <ErrorMessage message="Failed to search songs" onRetry={refetch} />
-      ) : searchResults && searchResults.data.length > 0 ? (
+      ) : searchResults &&
+        searchResults.data &&
+        searchResults.data.length > 0 ? (
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <h2 className="text-xl font-semibold text-white">

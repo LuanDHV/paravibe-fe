@@ -138,9 +138,9 @@ export default function PlaylistsPage() {
       {/* Playlists Grid */}
       {playlists && playlists.length > 0 ? (
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
-          {playlists.map((playlist) => (
+          {playlists.map((playlist, index) => (
             <Link
-              key={playlist.id}
+              key={`${playlist.id}-${index}`}
               href={`/playlist/${playlist.id}`}
               className="group bg-white/5 hover:bg-white/10 rounded-lg p-4 transition-colors"
             >

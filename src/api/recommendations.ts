@@ -13,7 +13,7 @@ export const recommendationsApi = {
         params: { topK: limit },
       }
     );
-    return response.data.data;
+    return response.data.data || [];
   },
 
   getSimilarSongs: async (
@@ -26,6 +26,6 @@ export const recommendationsApi = {
         params: { topK: limit },
       }
     );
-    return response.data.data;
+    return response.data.data || [];
   },
 };
