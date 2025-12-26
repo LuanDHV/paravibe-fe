@@ -1,7 +1,7 @@
+/* eslint-disable @next/next/no-img-element */
 // src/components/common/SongCard.tsx
 "use client";
 
-import Image from "next/image";
 import { Play, Pause } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Song } from "@/types";
@@ -38,15 +38,15 @@ export function SongCard({ song, showPlayButton = true }: SongCardProps) {
   };
 
   return (
-    <div className="group bg-white/5 hover:bg-white/10 rounded-lg p-4 transition-colors cursor-pointer">
+    <div className="group bg-white/5 hover:bg-white/10 rounded-lg p-4 text-center transition-colors cursor-pointer">
       <div className="relative mb-3">
-        <Image
-          src={song.artworkUrl || "/placeholder-album.jpg"}
-          alt={song.title}
-          width={160}
-          height={160}
-          className="w-full aspect-square object-cover rounded-md"
-        />
+        <div className="w-20 h-20 bg-gray-600 rounded-full mx-auto mb-3 flex items-center justify-center">
+          <img
+            src={song.imageUrl}
+            alt={song.title}
+            className="w-full h-full  object-cover"
+          />
+        </div>
         {showPlayButton && (
           <Button
             size="icon"

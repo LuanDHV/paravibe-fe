@@ -12,7 +12,7 @@ export interface Artist {
   id: string;
   name: string;
   bio?: string;
-  avatar?: string;
+  imageUrl?: string;
   genres: string[];
   createdAt: string;
 }
@@ -26,7 +26,7 @@ export interface Song {
   genre: string;
   releaseDate: string;
   previewUrl: string; // 30s preview
-  artworkUrl?: string;
+  imageUrl?: string;
   lyrics?: string;
   createdAt: string;
 }

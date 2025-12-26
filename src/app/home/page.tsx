@@ -103,7 +103,7 @@ export default function HomePage() {
             </h2>
             <p className="text-gray-400 text-sm">Your listening history</p>
           </div>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
             {recentSongs.map((song) => (
               <SongCard key={song.id} song={song} />
             ))}
@@ -118,7 +118,7 @@ export default function HomePage() {
             <h2 className="text-2xl font-bold text-white mb-1">Trending Now</h2>
             <p className="text-gray-400 text-sm">Popular songs this week</p>
           </div>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
             {trendingSongs.map((song) => (
               <SongCard key={song.id} song={song} />
             ))}
@@ -140,9 +140,9 @@ export default function HomePage() {
                 className="bg-white/5 rounded-lg p-4 text-center hover:bg-white/10 transition-colors cursor-pointer"
               >
                 <div className="w-20 h-20 bg-gray-600 rounded-full mx-auto mb-3 flex items-center justify-center">
-                  {artist.avatar ? (
+                  {artist.imageUrl ? (
                     <img
-                      src={artist.avatar}
+                      src={artist.imageUrl}
                       alt={artist.name}
                       className="w-full h-full rounded-full object-cover"
                     />
