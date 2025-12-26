@@ -18,7 +18,6 @@ export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
 
-  const { login } = useAuthStore();
   const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -27,8 +26,27 @@ export default function LoginPage() {
     setError("");
 
     try {
-      const { user, tokens } = await authApi.login(formData);
-      login(user, tokens);
+      const tokens = await authApi.login(formData);
+      // Set tokens temporarily for getProfile
+      const tempUser = {
+        id: "",
+        email: formData.email,
+        username: "",
+        avatar: "",
+        createdAt: "",
+      };
+      useAuthStore.getState().login(tempUser, tokens);
+      const profile = await authApi.getProfile();
+      const user = {
+        id: profile.userId!.toString(),
+        email: profile.email,
+        username: profile.name!,
+        avatar: "",
+        createdAt: profile.createdAt,
+        userId: profile.userId,
+        name: profile.name,
+      };
+      useAuthStore.getState().updateUser(user);
       router.push("/");
     } catch {
       setError("Invalid email or password");

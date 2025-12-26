@@ -6,6 +6,8 @@ export interface User {
   username: string;
   avatar?: string;
   createdAt: string;
+  userId?: number;
+  name?: string;
 }
 
 export interface Artist {

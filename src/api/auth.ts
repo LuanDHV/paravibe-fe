@@ -9,13 +9,9 @@ import {
 } from "@/types";
 
 export const authApi = {
-  login: async (
-    data: LoginRequest
-  ): Promise<{ user: User; tokens: AuthTokens }> => {
-    const response = await api.post<
-      ApiResponse<{ user: User; tokens: AuthTokens }>
-    >("/auth/login", data);
-    return response.data.data;
+  login: async (data: LoginRequest): Promise<AuthTokens> => {
+    const response = await api.post<AuthTokens>("/auth/login", data);
+    return response.data;
   },
 
   register: async (
@@ -28,10 +24,10 @@ export const authApi = {
   },
 
   refresh: async (refreshToken: string): Promise<AuthTokens> => {
-    const response = await api.post<ApiResponse<AuthTokens>>("/auth/refresh", {
+    const response = await api.post<AuthTokens>("/auth/refresh", {
       refreshToken,
     });
-    return response.data.data;
+    return response.data;
   },
 
   logout: async (): Promise<void> => {
@@ -39,7 +35,7 @@ export const authApi = {
   },
 
   getProfile: async (): Promise<User> => {
-    const response = await api.get<ApiResponse<User>>("/auth/profile");
-    return response.data.data;
+    const response = await api.get<User>("/users/me");
+    return response.data;
   },
 };
