@@ -114,7 +114,7 @@ export default function PlaylistDetailPage() {
           <div className="space-y-2">
             {playlist.songs.map((song, index) => (
               <div
-                key={song.id}
+                key={`${song.id}-${index}`}
                 className="flex items-center space-x-4 p-3 rounded-lg hover:bg-white/5 group"
               >
                 <div className="w-8 text-center text-gray-400">{index + 1}</div>

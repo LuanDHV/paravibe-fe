@@ -24,8 +24,8 @@ export function RecommendationSection({
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
-        {recommendations.map((rec) => (
-          <div key={rec.song.id} className="relative">
+        {recommendations.map((rec, index) => (
+          <div key={`${rec.song.id}-${index}`} className="relative">
             <SongCard song={rec.song} />
             <div className="absolute top-2 left-2 flex items-center space-x-1 bg-black/60 rounded px-2 py-1">
               <Star className="w-3 h-3 text-yellow-400 fill-current" />

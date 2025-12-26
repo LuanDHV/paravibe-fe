@@ -47,7 +47,7 @@ export default function LoginPage() {
         name: profile.name,
       };
       useAuthStore.getState().updateUser(user);
-      router.push("/");
+      router.push("/home");
     } catch {
       setError("Invalid email or password");
     } finally {

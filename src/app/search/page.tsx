@@ -139,8 +139,8 @@ export default function SearchPage() {
           </div>
 
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
-            {searchResults.data.map((song) => (
-              <SongCard key={song.id} song={song} />
+            {searchResults.data.map((song, index) => (
+              <SongCard key={`${song.id}-${index}`} song={song} />
             ))}
           </div>
 

@@ -2,6 +2,8 @@
 // src/app/home/page.tsx
 "use client";
 
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import { songsApi } from "@/api/songs";
 import { recommendationsApi } from "@/api/recommendations";
@@ -13,7 +15,14 @@ import { LoadingSpinner } from "@/components/common/LoadingSpinner";
 import { ErrorMessage } from "@/components/common/ErrorMessage";
 
 export default function HomePage() {
-  const { user } = useAuthStore();
+  const { user, isAuthenticated } = useAuthStore();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!isAuthenticated) {
+      router.push("/login");
+    }
+  }, [isAuthenticated, router]);
 
   // Fetch trending songs
   const {
@@ -104,8 +113,8 @@ export default function HomePage() {
             <p className="text-gray-400 text-sm">Your listening history</p>
           </div>
           <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
-            {recentSongs.map((song) => (
-              <SongCard key={song.id} song={song} />
+            {recentSongs.map((song, index) => (
+              <SongCard key={`${song.id}-${index}`} song={song} />
             ))}
           </div>
         </section>
@@ -119,8 +128,8 @@ export default function HomePage() {
             <p className="text-gray-400 text-sm">Popular songs this week</p>
           </div>
           <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
-            {trendingSongs.map((song) => (
-              <SongCard key={song.id} song={song} />
+            {trendingSongs.map((song, index) => (
+              <SongCard key={`${song.id}-${index}`} song={song} />
             ))}
           </div>
         </section>
@@ -134,9 +143,9 @@ export default function HomePage() {
             <p className="text-gray-400 text-sm">Discover new artists</p>
           </div>
           <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
-            {topArtists.map((artist) => (
+            {topArtists.map((artist, index) => (
               <div
-                key={artist.id}
+                key={`${artist.id}-${index}`}
                 className="bg-white/5 rounded-lg p-4 text-center hover:bg-white/10 transition-colors cursor-pointer"
               >
                 <div className="w-20 h-20 bg-gray-600 rounded-full mx-auto mb-3 flex items-center justify-center">

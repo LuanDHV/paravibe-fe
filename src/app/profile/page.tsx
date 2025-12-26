@@ -120,8 +120,8 @@ export default function ProfilePage() {
         <h2 className="text-2xl font-bold text-white">Recently Played</h2>
         {recentSongs && recentSongs.length > 0 ? (
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-            {recentSongs.map((song) => (
-              <SongCard key={song.id} song={song} />
+            {recentSongs.map((song, index) => (
+              <SongCard key={`${song.id}-${index}`} song={song} />
             ))}
           </div>
         ) : (
