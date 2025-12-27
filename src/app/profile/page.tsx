@@ -29,7 +29,13 @@ export default function ProfilePage() {
     enabled: !!user,
   });
 
-  if (historyLoading || playlistsLoading) {
+  const { data: topSongs, isLoading: topSongsLoading } = useQuery({
+    queryKey: ["user-top-songs", user?.id],
+    queryFn: () => (user ? historyApi.getTopSongs(user.id) : []),
+    enabled: !!user,
+  });
+
+  if (historyLoading || playlistsLoading || topSongsLoading) {
     return <LoadingSpinner />;
   }
 
@@ -131,6 +137,34 @@ export default function ProfilePage() {
           </div>
         )}
       </div>
+
+      {/* Top Songs */}
+      {topSongs && topSongs.length > 0 && (
+        <div className="space-y-4">
+          <h2 className="text-2xl font-bold text-white">Your Top Songs</h2>
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+            {topSongs.slice(0, 6).map((song, index) => (
+              <div key={song.songId} className="text-center">
+                <div className="bg-white/10 rounded-lg p-4 mb-2">
+                  <div className="text-2xl font-bold text-white mb-1">
+                    #{index + 1}
+                  </div>
+                  <div className="text-sm text-gray-300 truncate">
+                    {song.title}
+                  </div>
+                  <div className="text-xs text-gray-400 truncate">
+                    {song.artistName}
+                  </div>
+                </div>
+                <div className="text-xs text-gray-500">
+                  {song.playCount} plays • {Math.floor(song.totalDuration / 60)}
+                  m
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Favorite Genres */}
       <div className="space-y-4">

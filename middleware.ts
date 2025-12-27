@@ -8,15 +8,16 @@ const authRoutes = ["/login", "/register"];
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  // Check if user is authenticated (simplified - in real app, verify JWT)
+  // Check if user is authenticated via cookie
   const token = request.cookies.get("auth-token")?.value;
 
-  // Redirect to login if accessing protected route without auth
+  // For protected routes, only redirect if definitely no token
+  // Let client-side handle authentication state restoration
   if (protectedRoutes.some((route) => pathname.startsWith(route)) && !token) {
     return NextResponse.redirect(new URL("/login", request.url));
   }
 
-  // Redirect to home if accessing auth routes while authenticated
+  // For auth routes, redirect to home if token exists
   if (authRoutes.includes(pathname) && token) {
     return NextResponse.redirect(new URL("/home", request.url));
   }

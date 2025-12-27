@@ -2,6 +2,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import { Search as SearchIcon, Filter } from "lucide-react";
 import { Input } from "@/components/ui/input";
@@ -14,35 +15,106 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { songsApi } from "@/api/songs";
+import { artistsApi } from "@/api/artists";
 import { SongCard } from "@/components/common/SongCard";
 import { LoadingSpinner } from "@/components/common/LoadingSpinner";
 import { ErrorMessage } from "@/components/common/ErrorMessage";
 import { useDebounce } from "@/hooks/useDebounce";
 import { useAppStore } from "@/stores/app";
-import { SearchFilters } from "@/types";
+import { SearchFilters, Song, Artist } from "@/types";
+import { MUSIC_GENRES } from "@/lib/constants";
 
 export default function SearchPage() {
   const { searchQuery } = useAppStore();
+  const searchParams = useSearchParams();
   const [query, setQuery] = useState(searchQuery);
   const [filters, setFilters] = useState<SearchFilters>({});
 
   const debouncedQuery = useDebounce(query, 300);
 
+  // Initialize filters from URL params
+  useEffect(() => {
+    const genre = searchParams.get("genre");
+    const sort = searchParams.get("sort");
+
+    const initialFilters: SearchFilters = {};
+    if (genre) initialFilters.genre = genre;
+
+    setFilters(initialFilters);
+
+    // Handle special sort parameters
+    if (sort === "trending") {
+      // For trending, we'll use a different API call
+      setQuery(""); // Clear search query for trending
+    } else if (sort === "newest") {
+      // For newest, we can use the existing API with sorting
+      setQuery("");
+    } else if (sort === "recent") {
+      // For recent, this would be user-specific
+      setQuery("");
+    }
+
+    // Set initial query if provided
+    const searchParam = searchParams.get("q");
+    if (searchParam) setQuery(searchParam);
+  }, [searchParams]);
+
   const {
-    data: searchResults,
+    data: rawResults,
     isLoading,
     error,
     refetch,
-  } = useQuery({
-    queryKey: ["search-songs", debouncedQuery, filters],
-    queryFn: () =>
-      songsApi.getAll({
-        search: debouncedQuery || undefined,
-        genre: filters.genre,
-        ...filters,
-      }),
-    enabled: !!debouncedQuery || Object.keys(filters).length > 0,
+  } = useQuery<Song[] | { data: Song[]; total: number }>({
+    queryKey: [
+      "search-songs",
+      debouncedQuery,
+      filters,
+      searchParams.toString(),
+    ],
+    queryFn: () => {
+      const sort = searchParams.get("sort");
+
+      if (sort === "trending") {
+        return songsApi.getTrending(50);
+      } else if (sort === "newest") {
+        return songsApi.getAll({ limit: 50, page: 1 });
+      } else if (sort === "recent") {
+        // This would need user authentication, for now return empty
+        return Promise.resolve([]);
+      } else {
+        return songsApi.getAll({
+          search: debouncedQuery || undefined,
+          genre: filters.genre,
+          ...filters,
+          limit: 50,
+        });
+      }
+    },
+    enabled: true, // Always enabled since we handle URL params
   });
+
+  const {
+    data: artistResults,
+    isLoading: artistsLoading,
+    error: artistsError,
+  } = useQuery({
+    queryKey: ["search-artists", debouncedQuery],
+    queryFn: () =>
+      artistsApi.getAll({
+        search: debouncedQuery || undefined,
+        limit: 20,
+      }),
+    enabled: !!debouncedQuery,
+  });
+
+  // Normalize the data to always be an array of songs
+  const searchResults = rawResults
+    ? Array.isArray(rawResults)
+      ? { data: rawResults, total: rawResults.length }
+      : "data" in rawResults
+      ? { data: rawResults.data, total: rawResults.total }
+      : { data: [], total: 0 }
+    : { data: [], total: 0 };
 
   useEffect(() => {
     setQuery(searchQuery);
@@ -85,12 +157,12 @@ export default function SearchPage() {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All Genres</SelectItem>
-              <SelectItem value="pop">Pop</SelectItem>
-              <SelectItem value="rock">Rock</SelectItem>
-              <SelectItem value="hip-hop">Hip Hop</SelectItem>
-              <SelectItem value="electronic">Electronic</SelectItem>
-              <SelectItem value="jazz">Jazz</SelectItem>
-              <SelectItem value="classical">Classical</SelectItem>
+              {MUSIC_GENRES.map((genre) => (
+                <SelectItem key={genre} value={genre}>
+                  {genre.charAt(0).toUpperCase() +
+                    genre.slice(1).replace("-", " ")}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
 
@@ -121,30 +193,74 @@ export default function SearchPage() {
       </div>
 
       {/* Search Results */}
-      {isLoading ? (
+      {isLoading || artistsLoading ? (
         <LoadingSpinner />
-      ) : error ? (
-        <ErrorMessage message="Failed to search songs" onRetry={refetch} />
-      ) : searchResults &&
-        searchResults.data &&
-        searchResults.data.length > 0 ? (
-        <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <h2 className="text-xl font-semibold text-white">
-              {debouncedQuery ? `Results for "${debouncedQuery}"` : "All Songs"}
-            </h2>
-            <p className="text-gray-400 text-sm">
-              {searchResults.total} songs found
-            </p>
-          </div>
+      ) : error || artistsError ? (
+        <ErrorMessage message="Failed to search" onRetry={refetch} />
+      ) : searchResults?.data?.length > 0 ||
+        (artistResults?.data && artistResults.data.length > 0) ? (
+        <div className="space-y-8">
+          {/* Songs Results */}
+          {searchResults &&
+            searchResults.data &&
+            searchResults.data.length > 0 && (
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <h2 className="text-xl font-semibold text-white">
+                    {debouncedQuery
+                      ? `Songs for "${debouncedQuery}"`
+                      : "All Songs"}
+                  </h2>
+                  <p className="text-gray-400 text-sm">
+                    {searchResults.total} songs found
+                  </p>
+                </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
-            {searchResults.data.map((song, index) => (
-              <SongCard key={`${song.id}-${index}`} song={song} />
-            ))}
-          </div>
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+                  {searchResults.data.map((song: Song, index: number) => (
+                    <SongCard key={`${song.id}-${index}`} song={song} />
+                  ))}
+                </div>
+              </div>
+            )}
 
-          {/* Pagination would go here */}
+          {/* Artists Results */}
+          {artistResults &&
+            artistResults.data &&
+            artistResults.data.length > 0 && (
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <h2 className="text-xl font-semibold text-white">
+                    {debouncedQuery
+                      ? `Artists for "${debouncedQuery}"`
+                      : "Artists"}
+                  </h2>
+                  <p className="text-gray-400 text-sm">
+                    {artistResults.total || artistResults.data.length} artists
+                    found
+                  </p>
+                </div>
+
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+                  {artistResults.data.map((artist: Artist, index: number) => (
+                    <div
+                      key={`${artist.id}-${index}`}
+                      className="bg-gray-800 rounded-lg p-4 hover:bg-gray-700 transition-colors"
+                    >
+                      <div className="aspect-square bg-gray-700 rounded-lg mb-3 flex items-center justify-center">
+                        <span className="text-4xl">🎤</span>
+                      </div>
+                      <h3 className="font-medium text-white truncate">
+                        {artist.name}
+                      </h3>
+                      <p className="text-gray-400 text-sm">
+                        {artist.genres?.join(", ") || "Artist"}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
         </div>
       ) : debouncedQuery || Object.keys(filters).length > 0 ? (
         <div className="text-center py-12">

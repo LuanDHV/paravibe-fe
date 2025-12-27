@@ -1,11 +1,20 @@
 // src/app/playlist/[id]/page.tsx
 "use client";
 
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { Play, Plus, Edit, Trash2 } from "lucide-react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { playlistsApi } from "@/api/playlists";
 import { LoadingSpinner } from "@/components/common/LoadingSpinner";
 import { ErrorMessage } from "@/components/common/ErrorMessage";
@@ -13,9 +22,17 @@ import { usePlayerStore } from "@/stores/player";
 
 export default function PlaylistDetailPage() {
   const params = useParams();
+  const router = useRouter();
   const playlistId = params?.id as string;
 
   const { playSong } = usePlayerStore();
+
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [editPlaylist, setEditPlaylist] = useState({
+    name: "",
+    description: "",
+  });
 
   const {
     data: playlist,
@@ -29,9 +46,13 @@ export default function PlaylistDetailPage() {
 
   const handlePlayAll = () => {
     if (playlist?.songs.length) {
-      // Add all songs to queue and play first one
-      const { addToQueue } = usePlayerStore.getState();
-      playlist.songs.slice(1).forEach((song) => addToQueue(song));
+      const { clearQueue, addToQueue } = usePlayerStore.getState();
+
+      // Clear current queue and add all playlist songs
+      clearQueue();
+      playlist.songs.forEach((song) => addToQueue(song));
+
+      // Play the first song
       playSong(playlist.songs[0]);
     }
   };
@@ -45,6 +66,41 @@ export default function PlaylistDetailPage() {
     } catch (error) {
       console.error("Failed to remove song:", error);
     }
+  };
+
+  const handleEditPlaylist = async () => {
+    if (!playlist || !editPlaylist.name.trim()) return;
+
+    try {
+      await playlistsApi.update(playlist.id, {
+        name: editPlaylist.name,
+        description: editPlaylist.description,
+      });
+      setIsEditDialogOpen(false);
+      refetch();
+    } catch (error) {
+      console.error("Failed to update playlist:", error);
+    }
+  };
+
+  const handleDeletePlaylist = async () => {
+    if (!playlist) return;
+
+    try {
+      await playlistsApi.delete(playlist.id);
+      router.push("/playlists");
+    } catch (error) {
+      console.error("Failed to delete playlist:", error);
+    }
+  };
+
+  const openEditDialog = () => {
+    if (!playlist) return;
+    setEditPlaylist({
+      name: playlist.name,
+      description: playlist.description || "",
+    });
+    setIsEditDialogOpen(true);
   };
 
   if (isLoading) {
@@ -95,12 +151,16 @@ export default function PlaylistDetailPage() {
               Play All
             </Button>
 
-            <Button variant="outline" size="lg">
+            <Button variant="outline" size="lg" onClick={openEditDialog}>
               <Edit className="w-5 h-5 mr-2" />
               Edit
             </Button>
 
-            <Button variant="outline" size="lg">
+            <Button
+              variant="outline"
+              size="lg"
+              onClick={() => setIsDeleteDialogOpen(true)}
+            >
               <Trash2 className="w-5 h-5 mr-2" />
               Delete
             </Button>
@@ -173,6 +233,86 @@ export default function PlaylistDetailPage() {
           </div>
         )}
       </div>
+
+      {/* Edit Playlist Dialog */}
+      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Edit Playlist</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <label className="text-sm font-medium">Name</label>
+              <Input
+                value={editPlaylist.name}
+                onChange={(e) =>
+                  setEditPlaylist((prev) => ({
+                    ...prev,
+                    name: e.target.value,
+                  }))
+                }
+                placeholder="Playlist name"
+              />
+            </div>
+            <div>
+              <label className="text-sm font-medium">
+                Description (optional)
+              </label>
+              <Textarea
+                value={editPlaylist.description}
+                onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
+                  setEditPlaylist((prev) => ({
+                    ...prev,
+                    description: e.target.value,
+                  }))
+                }
+                placeholder="A collection of my favorite songs..."
+                rows={3}
+              />
+            </div>
+            <div className="flex justify-end space-x-2">
+              <Button
+                variant="outline"
+                onClick={() => setIsEditDialogOpen(false)}
+              >
+                Cancel
+              </Button>
+              <Button
+                onClick={handleEditPlaylist}
+                disabled={!editPlaylist.name.trim()}
+              >
+                Save Changes
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Playlist Dialog */}
+      <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Delete Playlist</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <p className="text-gray-400">
+              Are you sure you want to delete &quot;{playlist?.name}&quot;? This
+              action cannot be undone.
+            </p>
+            <div className="flex justify-end space-x-2">
+              <Button
+                variant="outline"
+                onClick={() => setIsDeleteDialogOpen(false)}
+              >
+                Cancel
+              </Button>
+              <Button variant="destructive" onClick={handleDeletePlaylist}>
+                Delete
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

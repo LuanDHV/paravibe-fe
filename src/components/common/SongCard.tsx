@@ -2,11 +2,11 @@
 // src/components/common/SongCard.tsx
 "use client";
 
-import { Play, Pause } from "lucide-react";
+import { Play, Pause, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Song } from "@/types";
 import { usePlayerStore } from "@/stores/player";
-import { historyApi } from "@/api/history";
+import { AddToPlaylistDialog } from "./AddToPlaylistDialog";
 
 interface SongCardProps {
   song: Song;
@@ -24,16 +24,16 @@ export function SongCard({ song, showPlayButton = true }: SongCardProps) {
       setPlaying(!isPlaying);
     } else {
       playSong(song);
-      // Track play history
-      try {
-        await historyApi.addHistory({
-          songId: song.id,
-          action: "PLAY",
-          duration: 0, // Will be updated when song ends
-        });
-      } catch (error) {
-        console.error("Failed to track play history:", error);
-      }
+      // Track play history - TODO: Implement when API is ready
+      // try {
+      //   await historyApi.addHistory({
+      //     songId: song.id,
+      //     action: "PLAY",
+      //     duration: 0, // Will be updated when song ends
+      //   });
+      // } catch (error) {
+      //   console.error("Failed to track play history:", error);
+      // }
     }
   };
 
@@ -48,17 +48,27 @@ export function SongCard({ song, showPlayButton = true }: SongCardProps) {
           />
         </div>
         {showPlayButton && (
-          <Button
-            size="icon"
-            className="absolute bottom-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity bg-green-500 hover:bg-green-600"
-            onClick={handlePlay}
-          >
-            {isCurrentlyPlaying ? (
-              <Pause className="w-5 h-5" />
-            ) : (
-              <Play className="w-5 h-5" />
-            )}
-          </Button>
+          <div className="absolute bottom-2 right-2 flex space-x-1">
+            <AddToPlaylistDialog song={song}>
+              <Button
+                size="icon"
+                className="w-8 h-8 opacity-0 group-hover:opacity-100 transition-opacity bg-gray-700 hover:bg-gray-600"
+              >
+                <Plus className="w-4 h-4" />
+              </Button>
+            </AddToPlaylistDialog>
+            <Button
+              size="icon"
+              className="w-8 h-8 opacity-0 group-hover:opacity-100 transition-opacity bg-green-500 hover:bg-green-600"
+              onClick={handlePlay}
+            >
+              {isCurrentlyPlaying ? (
+                <Pause className="w-4 h-4" />
+              ) : (
+                <Play className="w-4 h-4" />
+              )}
+            </Button>
+          </div>
         )}
       </div>
 

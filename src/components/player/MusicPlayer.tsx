@@ -48,18 +48,6 @@ export function MusicPlayer() {
     };
 
     const handleEnded = async () => {
-      // Track full play
-      if (currentSong) {
-        try {
-          await historyApi.addHistory({
-            songId: currentSong.id,
-            action: "PLAY",
-            duration: Math.floor(audio.duration),
-          });
-        } catch (error) {
-          console.error("Failed to track play history:", error);
-        }
-      }
       nextSong();
     };
 
@@ -81,6 +69,18 @@ export function MusicPlayer() {
 
     if (isPlaying) {
       audio.play().catch(console.error);
+      // Record play history when audio starts
+      if (currentSong) {
+        historyApi
+          .addHistory({
+            songId: currentSong.id,
+            action: "PLAY",
+            duration: 0,
+          })
+          .catch((error) => {
+            console.error("Failed to record play history:", error);
+          });
+      }
     } else {
       audio.pause();
     }
@@ -129,32 +129,44 @@ export function MusicPlayer() {
     return `${minutes}:${seconds.toString().padStart(2, "0")}`;
   };
 
-  if (!currentSong) {
-    return null;
-  }
-
   return (
-    <div className="fixed bottom-0 left-0 right-0 bg-black/95 backdrop-blur-lg border-t border-white/10 px-4 py-3">
-      <audio ref={audioRef} src={currentSong.previewUrl} preload="metadata" />
+    <div className="fixed bottom-0 left-0 right-0 bg-black/95 backdrop-blur-lg border-t border-white/10 px-4 py-3 z-50">
+      <audio ref={audioRef} src={currentSong?.previewUrl} preload="metadata" />
 
       <div className="flex items-center justify-between max-w-7xl mx-auto">
         {/* Song Info */}
         <div className="flex items-center space-x-3 min-w-0 flex-1">
-          <Image
-            src={currentSong.imageUrl || "/placeholder-album.jpg"}
-            alt={currentSong.title}
-            width={48}
-            height={48}
-            className="w-12 h-12 rounded object-cover"
-          />
-          <div className="min-w-0 flex-1">
-            <p className="text-white font-medium truncate">
-              {currentSong.title}
-            </p>
-            <p className="text-gray-400 text-sm truncate">
-              {currentSong.artist.name}
-            </p>
-          </div>
+          {currentSong ? (
+            <>
+              <Image
+                src={currentSong.imageUrl || "/placeholder-album.jpg"}
+                alt={currentSong.title}
+                width={48}
+                height={48}
+                className="w-12 h-12 rounded object-cover"
+              />
+              <div className="min-w-0 flex-1">
+                <p className="text-white font-medium truncate">
+                  {currentSong.title}
+                </p>
+                <p className="text-gray-400 text-sm truncate">
+                  {currentSong.artist.name}
+                </p>
+              </div>
+            </>
+          ) : (
+            <>
+              <div className="w-12 h-12 rounded bg-white/10 flex items-center justify-center">
+                <Volume2 className="w-6 h-6 text-gray-500" />
+              </div>
+              <div className="min-w-0 flex-1">
+                <p className="text-gray-400 font-medium">No song selected</p>
+                <p className="text-gray-500 text-sm">
+                  Choose a song to start listening
+                </p>
+              </div>
+            </>
+          )}
         </div>
 
         {/* Controls */}
@@ -163,8 +175,11 @@ export function MusicPlayer() {
             <Button
               variant="ghost"
               size="icon"
-              onClick={previousSong}
-              className="text-white hover:text-white hover:bg-white/10"
+              onClick={currentSong ? previousSong : undefined}
+              disabled={!currentSong}
+              className={`text-white hover:text-white hover:bg-white/10 ${
+                !currentSong ? "opacity-50 cursor-not-allowed" : ""
+              }`}
             >
               <SkipBack className="w-5 h-5" />
             </Button>
@@ -172,10 +187,13 @@ export function MusicPlayer() {
             <Button
               variant="ghost"
               size="icon"
-              onClick={handlePlayPause}
-              className="text-white hover:text-white bg-white/20 hover:bg-white/30 rounded-full w-10 h-10"
+              onClick={currentSong ? handlePlayPause : undefined}
+              disabled={!currentSong}
+              className={`text-white hover:text-white bg-white/20 hover:bg-white/30 rounded-full w-10 h-10 ${
+                !currentSong ? "opacity-50 cursor-not-allowed" : ""
+              }`}
             >
-              {isPlaying ? (
+              {currentSong && isPlaying ? (
                 <Pause className="w-5 h-5" />
               ) : (
                 <Play className="w-5 h-5 ml-0.5" />
@@ -185,8 +203,11 @@ export function MusicPlayer() {
             <Button
               variant="ghost"
               size="icon"
-              onClick={nextSong}
-              className="text-white hover:text-white hover:bg-white/10"
+              onClick={currentSong ? nextSong : undefined}
+              disabled={!currentSong}
+              className={`text-white hover:text-white hover:bg-white/10 ${
+                !currentSong ? "opacity-50 cursor-not-allowed" : ""
+              }`}
             >
               <SkipForward className="w-5 h-5" />
             </Button>
@@ -195,17 +216,18 @@ export function MusicPlayer() {
           {/* Progress Bar */}
           <div className="flex items-center space-x-2 w-full">
             <span className="text-xs text-gray-400 w-10 text-right">
-              {formatTime(currentTime)}
+              {currentSong ? formatTime(currentTime) : "--:--"}
             </span>
             <Slider
-              value={[currentTime]}
-              max={duration || 30}
+              value={[currentSong ? currentTime : 0]}
+              max={currentSong ? duration || 30 : 100}
               step={1}
-              onValueChange={handleProgressChange}
-              className="flex-1"
+              onValueChange={currentSong ? handleProgressChange : undefined}
+              disabled={!currentSong}
+              className={`flex-1 ${!currentSong ? "opacity-50" : ""}`}
             />
             <span className="text-xs text-gray-400 w-10">
-              {formatTime(duration || 30)}
+              {currentSong ? formatTime(duration || 30) : "--:--"}
             </span>
           </div>
         </div>
@@ -215,10 +237,13 @@ export function MusicPlayer() {
           <Button
             variant="ghost"
             size="icon"
-            onClick={toggleMute}
-            className="text-white hover:text-white hover:bg-white/10"
+            onClick={currentSong ? toggleMute : undefined}
+            disabled={!currentSong}
+            className={`text-white hover:text-white hover:bg-white/10 ${
+              !currentSong ? "opacity-50 cursor-not-allowed" : ""
+            }`}
           >
-            {isMuted || volume === 0 ? (
+            {currentSong && (isMuted || volume === 0) ? (
               <VolumeX className="w-5 h-5" />
             ) : (
               <Volume2 className="w-5 h-5" />
@@ -226,14 +251,28 @@ export function MusicPlayer() {
           </Button>
           <div className="w-24">
             <Slider
-              value={[isMuted ? 0 : volume]}
+              value={[currentSong ? (isMuted ? 0 : volume) : 0.7]}
               max={1}
               step={0.01}
-              onValueChange={handleVolumeChange}
+              onValueChange={currentSong ? handleVolumeChange : undefined}
+              disabled={!currentSong}
+              className={!currentSong ? "opacity-50" : ""}
             />
           </div>
         </div>
       </div>
+
+      {/* Hidden audio element */}
+      {currentSong && (
+        <audio
+          ref={audioRef}
+          src={currentSong.previewUrl}
+          preload="metadata"
+          onError={(e) => {
+            console.error("Audio loading error:", e);
+          }}
+        />
+      )}
     </div>
   );
 }

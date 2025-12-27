@@ -17,7 +17,9 @@ export const artistsApi = {
   },
 
   getById: async (id: string): Promise<Artist> => {
-    const response = await api.get<ApiResponse<Artist>>(`/artists/${id}`);
+    const response = await api.get<ApiResponse<Artist>>(
+      `/artists/${parseInt(id, 10)}`
+    );
     return response.data.data;
   },
 

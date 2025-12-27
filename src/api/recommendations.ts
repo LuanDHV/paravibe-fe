@@ -8,7 +8,7 @@ export const recommendationsApi = {
     limit: number = 20
   ): Promise<Recommendation[]> => {
     const response = await api.get<ApiResponse<Recommendation[]>>(
-      `/recommendations/user/${userId}`,
+      `/recommendations/user/${parseInt(userId, 10)}`,
       {
         params: { topK: limit },
       }
@@ -21,7 +21,7 @@ export const recommendationsApi = {
     limit: number = 10
   ): Promise<Recommendation[]> => {
     const response = await api.get<ApiResponse<Recommendation[]>>(
-      `/recommendations/song/${songId}`,
+      `/recommendations/song/${parseInt(songId, 10)}`,
       {
         params: { topK: limit },
       }

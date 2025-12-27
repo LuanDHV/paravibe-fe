@@ -50,6 +50,14 @@ export interface Recommendation {
   reason?: string;
 }
 
+export interface TopSong {
+  songId: number;
+  title: string;
+  artistName: string;
+  playCount: number;
+  totalDuration: number;
+}
+
 export interface HistoryItem {
   id: string;
   userId: string;
