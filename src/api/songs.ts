@@ -1,6 +1,6 @@
 // src/api/songs.ts
 import { api } from "@/lib/api";
-import { Song, ApiResponse } from "@/types";
+import { Song } from "@/types";
 
 // Backend response types
 interface BackendSongResponse {
@@ -9,7 +9,7 @@ interface BackendSongResponse {
   title: string;
   artistId?: number;
   artistName?: string;
-  artist?: { id: number; name: string };
+  artist?: { artistId: number; name: string };
   album?: string;
   duration?: number;
   genre?: string;
@@ -22,9 +22,10 @@ interface BackendSongResponse {
 }
 
 interface BackendSongsListResponse {
-  data?: BackendSongResponse[];
-  total?: number;
-  [key: string]: unknown;
+  data: BackendSongResponse[];
+  total: number;
+  limit?: string;
+  page?: number;
 }
 
 // Adapter function to convert backend song format to frontend format
@@ -41,7 +42,7 @@ function adaptSong(backendSong: BackendSongResponse): Song {
     id: songId?.toString() || "",
     title: backendSong.title || "",
     artist: {
-      id: (backendSong.artistId || backendSong.artist?.id)?.toString() || "",
+      id: (backendSong.artistId || backendSong.artist?.artistId)?.toString() || "",
       name: backendSong.artistName || backendSong.artist?.name || "",
       genres: backendSong.genres || [backendSong.genre || ""],
       createdAt: backendSong.createdAt || new Date().toISOString(),
@@ -66,45 +67,46 @@ export const songsApi = {
     artist?: string;
     search?: string;
   }): Promise<{ data: Song[]; total: number }> => {
-    const response = await api.get<ApiResponse<BackendSongsListResponse>>(
+    const response = await api.get<BackendSongsListResponse>(
       "/songs",
       { params }
     );
-    const backendData = response.data.data;
-    const songs = backendData?.data || [];
+    const songs = response.data.data || [];
     return {
-      data: songs.map(adaptSong),
-      total: backendData?.total || songs.length,
+      data: Array.isArray(songs) ? songs.map(adaptSong) : [],
+      total: response.data.total || songs.length,
     };
   },
 
   getById: async (id: string): Promise<Song> => {
-    const response = await api.get<ApiResponse<BackendSongResponse>>(
+    const response = await api.get<BackendSongResponse>(
       `/songs/${parseInt(id, 10)}`
     );
-    return adaptSong(response.data.data);
+    return adaptSong(response.data);
   },
 
   getTrending: async (limit: number = 20): Promise<Song[]> => {
-    const response = await api.get<ApiResponse<BackendSongResponse[]>>(
+    const response = await api.get<BackendSongResponse[]>(
       "/songs/trending",
       {
         params: { limit },
       }
     );
-    return (response.data.data || []).map(adaptSong);
+    const songs = response.data || [];
+    return Array.isArray(songs) ? songs.map(adaptSong) : [];
   },
 
   getRecentlyPlayed: async (
     userId: string,
     limit: number = 20
   ): Promise<Song[]> => {
-    const response = await api.get<ApiResponse<BackendSongResponse[]>>(
+    const response = await api.get<BackendSongResponse[]>(
       `/users/${parseInt(userId, 10)}/history`,
       {
         params: { limit },
       }
     );
-    return (response.data.data || []).map(adaptSong);
+    const songs = response.data || [];
+    return Array.isArray(songs) ? songs.map(adaptSong) : [];
   },
 };
