@@ -34,7 +34,7 @@ export default function ArtistDetailPage() {
     error: songsError,
   } = useQuery({
     queryKey: ["artist-songs", artistId],
-    queryFn: () => songsApi.getAll({ artist: artistId, limit: 50 }),
+    queryFn: () => songsApi.getAll({ artist: artistId, limit: 1000 }),
     enabled: !!artist,
   });
 

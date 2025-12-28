@@ -77,7 +77,7 @@ export default function SearchPage() {
       if (sort === "trending") {
         return songsApi.getTrending(50);
       } else if (sort === "newest") {
-        return songsApi.getAll({ limit: 50, page: 1 });
+        return songsApi.getAll({ limit: 1000, page: 1 });
       } else if (sort === "recent") {
         // This would need user authentication, for now return empty
         return Promise.resolve([]);
@@ -86,7 +86,7 @@ export default function SearchPage() {
           search: debouncedQuery || undefined,
           genre: filters.genre,
           ...filters,
-          limit: 50,
+          limit: 1000,
         });
       }
     },

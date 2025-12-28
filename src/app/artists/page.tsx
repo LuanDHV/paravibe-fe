@@ -14,7 +14,7 @@ export default function ArtistsPage() {
     error,
   } = useQuery({
     queryKey: ["all-artists"],
-    queryFn: () => artistsApi.getAll({ limit: 50 }),
+    queryFn: () => artistsApi.getAll({ limit: 1000 }),
   });
 
   if (isLoading) {
