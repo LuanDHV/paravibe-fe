@@ -42,7 +42,9 @@ function adaptSong(backendSong: BackendSongResponse): Song {
     id: songId?.toString() || "",
     title: backendSong.title || "",
     artist: {
-      id: (backendSong.artistId || backendSong.artist?.artistId)?.toString() || "",
+      id:
+        (backendSong.artistId || backendSong.artist?.artistId)?.toString() ||
+        "",
       name: backendSong.artistName || backendSong.artist?.name || "",
       genres: backendSong.genres || [backendSong.genre || ""],
       createdAt: backendSong.createdAt || new Date().toISOString(),
@@ -67,10 +69,9 @@ export const songsApi = {
     artist?: string;
     search?: string;
   }): Promise<{ data: Song[]; total: number }> => {
-    const response = await api.get<BackendSongsListResponse>(
-      "/songs",
-      { params }
-    );
+    const response = await api.get<BackendSongsListResponse>("/songs", {
+      params,
+    });
     const songs = response.data.data || [];
     return {
       data: Array.isArray(songs) ? songs.map(adaptSong) : [],
@@ -86,12 +87,9 @@ export const songsApi = {
   },
 
   getTrending: async (limit: number = 20): Promise<Song[]> => {
-    const response = await api.get<BackendSongResponse[]>(
-      "/songs/trending",
-      {
-        params: { limit },
-      }
-    );
+    const response = await api.get<BackendSongResponse[]>("/songs/trending", {
+      params: { limit },
+    });
     const songs = response.data || [];
     return Array.isArray(songs) ? songs.map(adaptSong) : [];
   },
