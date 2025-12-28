@@ -50,6 +50,14 @@ export interface Recommendation {
   reason?: string;
 }
 
+export interface AIRecSong {
+  songId: number;
+  title: string;
+  artistName: string;
+  genre: string;
+  score: number;
+}
+
 export interface TopSong {
   songId: number;
   title: string;

@@ -36,7 +36,7 @@ export function MainLayout({ children }: MainLayoutProps) {
       {/* Main content */}
       <div className="flex flex-1 flex-col overflow-hidden pb-16">
         <Header />
-        <main className="flex-1 overflow-y-auto p-6">{children}</main>
+        <main className="flex-1 overflow-y-auto p-6 py-12">{children}</main>
       </div>
 
       {/* Music Player */}

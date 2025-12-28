@@ -7,9 +7,11 @@ import { useAuthStore } from "@/stores/auth";
 import { historyApi } from "@/api/history";
 import { playlistsApi } from "@/api/playlists";
 import { songsApi } from "@/api/songs";
+import { recommendationsApi } from "@/api/recommendations";
 import { LoadingSpinner } from "@/components/common/LoadingSpinner";
 import { ErrorMessage } from "@/components/common/ErrorMessage";
 import { SongCard } from "@/components/common/SongCard";
+import { RecommendationSection } from "@/components/common/RecommendationSection";
 
 export default function ProfilePage() {
   const { user } = useAuthStore();
@@ -30,9 +32,10 @@ export default function ProfilePage() {
     enabled: !!user,
   });
 
-  const { data: topSongs, isLoading: topSongsLoading } = useQuery({
-    queryKey: ["user-top-songs", user?.id],
-    queryFn: () => (user ? historyApi.getTopSongs(user.id) : []),
+  // Fetch AI recommendations for user
+  const { data: aiRecommendations, isLoading: aiRecLoading } = useQuery({
+    queryKey: ["ai-recommendations", user?.id],
+    queryFn: () => (user ? recommendationsApi.getForUser(user.id, 20) : []),
     enabled: !!user,
   });
 
@@ -64,8 +67,8 @@ export default function ProfilePage() {
   if (
     historyLoading ||
     playlistsLoading ||
-    topSongsLoading ||
-    recentSongsLoading
+    recentSongsLoading ||
+    aiRecLoading
   ) {
     return <LoadingSpinner />;
   }
@@ -161,63 +164,14 @@ export default function ProfilePage() {
         )}
       </div>
 
-      {/* Top Songs */}
-      {topSongs && topSongs.length > 0 && (
-        <div className="space-y-4">
-          <h2 className="text-2xl font-bold text-white">Your Top Songs</h2>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-            {topSongs.slice(0, 6).map((song, index) => (
-              <div key={song.songId} className="text-center">
-                <div className="bg-white/10 rounded-lg p-4 mb-2">
-                  <div className="text-2xl font-bold text-white mb-1">
-                    #{index + 1}
-                  </div>
-                  <div className="text-sm text-gray-300 truncate">
-                    {song.title}
-                  </div>
-                  <div className="text-xs text-gray-400 truncate">
-                    {song.artistName}
-                  </div>
-                </div>
-                <div className="text-xs text-gray-500">
-                  {song.playCount} plays • {Math.floor(song.totalDuration / 60)}
-                  m
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
+      {/* AI Recommendations */}
+      {aiRecommendations && aiRecommendations.length > 0 && (
+        <RecommendationSection
+          title="Recommended For You"
+          subtitle="AI-powered recommendations based on your listening history"
+          recommendations={aiRecommendations}
+        />
       )}
-
-      {/* Favorite Genres */}
-      <div className="space-y-4">
-        <h2 className="text-2xl font-bold text-white">Your Top Genres</h2>
-        <div className="flex flex-wrap gap-3">
-          {history && history.length > 0 ? (
-            Object.entries(
-              history
-                .filter((h) => h.action === "PLAY" && h.song) // Only include items with song data
-                .reduce((acc, h) => {
-                  const genre = h.song!.genre || "Unknown"; // Use non-null assertion since we filtered
-                  acc[genre] = (acc[genre] || 0) + 1;
-                  return acc;
-                }, {} as Record<string, number>)
-            )
-              .sort(([, a], [, b]) => b - a)
-              .slice(0, 5)
-              .map(([genre, count]) => (
-                <div
-                  key={genre}
-                  className="bg-white/10 rounded-full px-4 py-2 text-sm text-white"
-                >
-                  {genre} ({count})
-                </div>
-              ))
-          ) : (
-            <p className="text-gray-400">No genre data available</p>
-          )}
-        </div>
-      </div>
     </div>
   );
 }
