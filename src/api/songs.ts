@@ -55,7 +55,7 @@ function adaptSong(backendSong: BackendSongResponse): Song {
     releaseDate:
       backendSong.releaseDate || new Date().toISOString().split("T")[0],
     previewUrl: backendSong.previewUrl || "",
-    imageUrl: backendSong.imageUrl,
+    imageUrl: backendSong.imageUrl || undefined,
     lyrics: backendSong.lyrics,
     createdAt: backendSong.createdAt || new Date().toISOString(),
   };

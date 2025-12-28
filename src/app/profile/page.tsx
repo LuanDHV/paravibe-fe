@@ -6,6 +6,7 @@ import { Calendar, Clock, Music, TrendingUp } from "lucide-react";
 import { useAuthStore } from "@/stores/auth";
 import { historyApi } from "@/api/history";
 import { playlistsApi } from "@/api/playlists";
+import { songsApi } from "@/api/songs";
 import { LoadingSpinner } from "@/components/common/LoadingSpinner";
 import { ErrorMessage } from "@/components/common/ErrorMessage";
 import { SongCard } from "@/components/common/SongCard";
@@ -35,7 +36,37 @@ export default function ProfilePage() {
     enabled: !!user,
   });
 
-  if (historyLoading || playlistsLoading || topSongsLoading) {
+  const recentSongIds = history
+    ?.filter((h) => h.action === "PLAY")
+    .sort(
+      (a, b) =>
+        new Date(b.listenedAt).getTime() - new Date(a.listenedAt).getTime()
+    )
+    .slice(0, 6)
+    .map((h) => h.songId)
+    .filter((songId, index, arr) => arr.indexOf(songId) === index); // Remove duplicates
+
+  // Fetch full song data for recent songs
+  const { data: recentSongsData, isLoading: recentSongsLoading } = useQuery({
+    queryKey: ["recent-songs-data", recentSongIds],
+    queryFn: async () => {
+      if (!recentSongIds || recentSongIds.length === 0) return [];
+
+      const songPromises = recentSongIds.map((songId) =>
+        songsApi.getById(songId)
+      );
+      const songs = await Promise.all(songPromises);
+      return songs;
+    },
+    enabled: !!recentSongIds && recentSongIds.length > 0,
+  });
+
+  if (
+    historyLoading ||
+    playlistsLoading ||
+    topSongsLoading ||
+    recentSongsLoading
+  ) {
     return <LoadingSpinner />;
   }
 
@@ -51,21 +82,13 @@ export default function ProfilePage() {
   const totalPlays = history?.filter((h) => h.action === "PLAY").length || 0;
   const uniqueSongs = new Set(history?.map((h) => h.songId)).size || 0;
   const totalListeningTime =
-    history?.reduce((acc, h) => acc + h.duration, 0) || 0;
+    history?.reduce((acc, h) => acc + h.durationListened, 0) || 0;
 
   const formatDuration = (seconds: number) => {
     const hours = Math.floor(seconds / 3600);
     const minutes = Math.floor((seconds % 3600) / 60);
     return `${hours}h ${minutes}m`;
   };
-
-  const recentSongs = history
-    ?.filter((h) => h.action === "PLAY")
-    .sort(
-      (a, b) => new Date(b.playedAt).getTime() - new Date(a.playedAt).getTime()
-    )
-    .slice(0, 6)
-    .map((h) => h.song);
 
   return (
     <div className="space-y-8">
@@ -124,9 +147,9 @@ export default function ProfilePage() {
       {/* Recent Activity */}
       <div className="space-y-4">
         <h2 className="text-2xl font-bold text-white">Recently Played</h2>
-        {recentSongs && recentSongs.length > 0 ? (
+        {recentSongsData && recentSongsData.length > 0 ? (
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-            {recentSongs.map((song, index) => (
+            {recentSongsData.map((song, index) => (
               <SongCard key={`${song.id}-${index}`} song={song} />
             ))}
           </div>
@@ -173,9 +196,10 @@ export default function ProfilePage() {
           {history && history.length > 0 ? (
             Object.entries(
               history
-                .filter((h) => h.action === "PLAY")
+                .filter((h) => h.action === "PLAY" && h.song) // Only include items with song data
                 .reduce((acc, h) => {
-                  acc[h.song.genre] = (acc[h.song.genre] || 0) + 1;
+                  const genre = h.song!.genre || "Unknown"; // Use non-null assertion since we filtered
+                  acc[genre] = (acc[genre] || 0) + 1;
                   return acc;
                 }, {} as Record<string, number>)
             )

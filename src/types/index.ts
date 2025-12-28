@@ -59,13 +59,16 @@ export interface TopSong {
 }
 
 export interface HistoryItem {
-  id: string;
+  historyId: string; // matches backend field name
   userId: string;
   songId: string;
-  song: Song;
+  song?: Song; // Optional - backend might not return full song object
   action: "PLAY" | "SKIP" | "LIKE";
-  duration: number; // seconds played
-  playedAt: string;
+  durationListened: number; // seconds played
+  listenedAt: string; // matches backend field name
+  // Backend returns these fields instead of full song object
+  songTitle?: string;
+  artistName?: string;
 }
 
 export interface AuthTokens {

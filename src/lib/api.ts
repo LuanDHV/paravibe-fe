@@ -1,6 +1,7 @@
 // src/lib/api.ts
 import axios from "axios";
 import { useAuthStore } from "@/stores/auth";
+import { refreshAccessToken, shouldRefreshToken } from "@/lib/utils";
 
 const API_BASE_URL = "http://localhost:8080/api/v1";
 const AI_API_BASE_URL = "http://localhost:8000/api/v1";
@@ -13,10 +14,27 @@ export const api = axios.create({
 
 // Request interceptor to add auth token
 api.interceptors.request.use(
-  (config) => {
+  async (config) => {
     const { tokens } = useAuthStore.getState();
     if (tokens?.accessToken) {
-      config.headers.Authorization = `Bearer ${tokens.accessToken}`;
+      // Check if token needs refresh before making request
+      if (shouldRefreshToken()) {
+        try {
+          await refreshAccessToken();
+          // Get updated tokens
+          const updatedTokens = useAuthStore.getState().tokens;
+          if (updatedTokens?.accessToken) {
+            config.headers.Authorization = `Bearer ${updatedTokens.accessToken}`;
+          }
+        } catch (error) {
+          console.error(
+            "Failed to refresh token in request interceptor:",
+            error
+          );
+        }
+      } else {
+        config.headers.Authorization = `Bearer ${tokens.accessToken}`;
+      }
     }
     return config;
   },
@@ -42,7 +60,7 @@ api.interceptors.response.use(
             }
           );
 
-          const newTokens = refreshResponse.data.data;
+          const newTokens = refreshResponse.data.data || refreshResponse.data;
 
           // Update tokens in store
           const currentUser = useAuthStore.getState().user;

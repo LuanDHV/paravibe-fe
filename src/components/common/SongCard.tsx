@@ -41,11 +41,17 @@ export function SongCard({ song, showPlayButton = true }: SongCardProps) {
     <div className="group bg-white/5 hover:bg-white/10 rounded-lg p-4 text-center transition-colors cursor-pointer">
       <div className="relative mb-3">
         <div className="w-20 h-20 bg-gray-600 rounded-full mx-auto mb-3 flex items-center justify-center">
-          <img
-            src={song.imageUrl}
-            alt={song.title}
-            className="w-full h-full  object-cover"
-          />
+          {song.imageUrl ? (
+            <img
+              src={song.imageUrl}
+              alt={song.title}
+              className="w-full h-full object-cover rounded-full"
+            />
+          ) : (
+            <div className="w-full h-full bg-gray-700 rounded-full flex items-center justify-center">
+              <span className="text-gray-400 text-2xl">🎵</span>
+            </div>
+          )}
         </div>
         {showPlayButton && (
           <div className="absolute bottom-2 right-2 flex space-x-1">

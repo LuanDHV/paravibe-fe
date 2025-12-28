@@ -48,6 +48,23 @@ export function MusicPlayer() {
     };
 
     const handleEnded = async () => {
+      // Record completion history with actual duration listened (minimum 10 seconds)
+      if (currentSong && duration > 10) {
+        try {
+          await historyApi.addHistory({
+            songId: currentSong.id,
+            action: "PLAY",
+            duration: Math.floor(duration), // Send actual duration listened
+          });
+          console.log(
+            `Recorded ${Math.floor(duration)}s play for song: ${
+              currentSong.title
+            }`
+          );
+        } catch (error) {
+          console.error("Failed to record completion history:", error);
+        }
+      }
       nextSong();
     };
 
@@ -60,27 +77,16 @@ export function MusicPlayer() {
       audio.removeEventListener("timeupdate", handleTimeUpdate);
       audio.removeEventListener("ended", handleEnded);
     };
-  }, [currentSong, setDuration, setCurrentTime, nextSong]);
+  }, [currentSong, setDuration, setCurrentTime, nextSong, duration]);
 
   // Play/pause effect
   useEffect(() => {
     const audio = audioRef.current;
     if (!audio) return;
 
-    if (isPlaying) {
+    if (isPlaying && currentSong?.previewUrl) {
       audio.play().catch(console.error);
-      // Record play history when audio starts
-      if (currentSong) {
-        historyApi
-          .addHistory({
-            songId: currentSong.id,
-            action: "PLAY",
-            duration: 0,
-          })
-          .catch((error) => {
-            console.error("Failed to record play history:", error);
-          });
-      }
+      // Note: History tracking moved to song completion to avoid duration: 0 validation error
     } else {
       audio.pause();
     }
@@ -95,6 +101,10 @@ export function MusicPlayer() {
   }, [volume]);
 
   const handlePlayPause = () => {
+    if (!currentSong?.previewUrl) {
+      console.warn("No preview URL available for this song");
+      return;
+    }
     setPlaying(!isPlaying);
   };
 
@@ -131,8 +141,6 @@ export function MusicPlayer() {
 
   return (
     <div className="fixed bottom-0 left-0 right-0 bg-black/95 backdrop-blur-lg border-t border-white/10 px-4 py-3 z-50">
-      <audio ref={audioRef} src={currentSong?.previewUrl} preload="metadata" />
-
       <div className="flex items-center justify-between max-w-7xl mx-auto">
         {/* Song Info */}
         <div className="flex items-center space-x-3 min-w-0 flex-1">
@@ -187,10 +195,10 @@ export function MusicPlayer() {
             <Button
               variant="ghost"
               size="icon"
-              onClick={currentSong ? handlePlayPause : undefined}
-              disabled={!currentSong}
+              onClick={currentSong?.previewUrl ? handlePlayPause : undefined}
+              disabled={!currentSong?.previewUrl}
               className={`text-white hover:text-white bg-white/20 hover:bg-white/30 rounded-full w-10 h-10 ${
-                !currentSong ? "opacity-50 cursor-not-allowed" : ""
+                !currentSong?.previewUrl ? "opacity-50 cursor-not-allowed" : ""
               }`}
             >
               {currentSong && isPlaying ? (
@@ -263,7 +271,7 @@ export function MusicPlayer() {
       </div>
 
       {/* Hidden audio element */}
-      {currentSong && (
+      {currentSong && currentSong.previewUrl && (
         <audio
           ref={audioRef}
           src={currentSong.previewUrl}

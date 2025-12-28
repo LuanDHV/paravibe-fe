@@ -16,6 +16,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { playlistsApi } from "@/api/playlists";
+import { songsApi } from "@/api/songs";
 import { LoadingSpinner } from "@/components/common/LoadingSpinner";
 import { ErrorMessage } from "@/components/common/ErrorMessage";
 import { usePlayerStore } from "@/stores/player";
@@ -44,19 +45,33 @@ export default function PlaylistDetailPage() {
     queryFn: () => playlistsApi.getById(playlistId),
   });
 
+  // Fetch full song data for playlist songs
+  const { data: fullSongData, isLoading: songsLoading } = useQuery({
+    queryKey: ["playlist-songs", playlistId, playlist?.songs],
+    queryFn: async () => {
+      if (!playlist?.songs || playlist.songs.length === 0) return [];
+
+      const songPromises = playlist.songs.map((song) =>
+        songsApi.getById(song.id)
+      );
+      const songs = await Promise.all(songPromises);
+      return songs;
+    },
+    enabled: !!playlist?.songs && playlist.songs.length > 0,
+  });
+
   const handlePlayAll = () => {
-    if (playlist?.songs.length) {
+    if (fullSongData?.length) {
       const { clearQueue, addToQueue } = usePlayerStore.getState();
 
       // Clear current queue and add all playlist songs
       clearQueue();
-      playlist.songs.forEach((song) => addToQueue(song));
+      fullSongData.forEach((song) => addToQueue(song));
 
       // Play the first song
-      playSong(playlist.songs[0]);
+      playSong(fullSongData[0]);
     }
   };
-
   const handleRemoveSong = async (songId: string) => {
     if (!playlist) return;
 
@@ -103,7 +118,7 @@ export default function PlaylistDetailPage() {
     setIsEditDialogOpen(true);
   };
 
-  if (isLoading) {
+  if (isLoading || songsLoading) {
     return <LoadingSpinner />;
   }
 
@@ -135,7 +150,7 @@ export default function PlaylistDetailPage() {
               <p className="text-gray-300 mb-4">{playlist.description}</p>
             )}
             <p className="text-sm text-gray-400">
-              {playlist.songs.length} songs • Created{" "}
+              {fullSongData?.length || 0} songs • Created{" "}
               {new Date(playlist.createdAt).toLocaleDateString()}
             </p>
           </div>
@@ -145,7 +160,7 @@ export default function PlaylistDetailPage() {
               onClick={handlePlayAll}
               size="lg"
               className="bg-green-500 hover:bg-green-600 text-black font-semibold px-8"
-              disabled={playlist.songs.length === 0}
+              disabled={!fullSongData || fullSongData.length === 0}
             >
               <Play className="w-5 h-5 mr-2 fill-current" />
               Play All
@@ -170,9 +185,9 @@ export default function PlaylistDetailPage() {
 
       {/* Songs List */}
       <div className="space-y-4">
-        {playlist.songs.length > 0 ? (
+        {fullSongData && fullSongData.length > 0 ? (
           <div className="space-y-2">
-            {playlist.songs.map((song, index) => (
+            {fullSongData.map((song, index) => (
               <div
                 key={`${song.id}-${index}`}
                 className="flex items-center space-x-4 p-3 rounded-lg hover:bg-white/5 group"
