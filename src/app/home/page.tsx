@@ -15,7 +15,7 @@ import { RecommendationSection } from "@/components/common/RecommendationSection
 import { GenreSection } from "@/components/common/GenreSection";
 import { LoadingSpinner } from "@/components/common/LoadingSpinner";
 import { ErrorMessage } from "@/components/common/ErrorMessage";
-// import { MUSIC_GENRES } from "@/lib/constants";
+import { MUSIC_GENRES } from "@/lib/constants";
 
 export default function HomePage() {
   const { user, isAuthenticated } = useAuthStore();
@@ -26,6 +26,44 @@ export default function HomePage() {
       router.push("/login");
     }
   }, [isAuthenticated, router]);
+
+  // Genre display mapping
+  const genreDisplayMap: Record<string, { title: string; subtitle: string }> = {
+    pop: { title: "Pop Hits", subtitle: "Catchy pop songs and chart-toppers" },
+    rock: { title: "Rock Anthems", subtitle: "Rock legends and modern rock hits" },
+    hiphop: { title: "Hip Hop Central", subtitle: "The latest hip hop tracks" },
+    edm: { title: "EDM Energy", subtitle: "Electronic dance music hits" },
+    latin: { title: "Latin Vibes", subtitle: "Latin music and rhythms" },
+    rnb: { title: "R&B Vibes", subtitle: "Soulful R&B and contemporary hits" },
+    soul: { title: "Soul Classics", subtitle: "Timeless soul music" },
+    indie: { title: "Indie Spotlight", subtitle: "Independent artists and fresh sounds" },
+    alternative: { title: "Alternative Rock", subtitle: "Indie and alternative hits" },
+    experimental: { title: "Experimental", subtitle: "Avant-garde and experimental music" },
+    electronic: { title: "Electronic Vibes", subtitle: "Electronic and dance music" },
+    house: { title: "House Party", subtitle: "House music and club hits" },
+    techno: { title: "Techno Beats", subtitle: "Techno and electronic rhythms" },
+    trap: { title: "Trap Zone", subtitle: "Trap beats and urban sounds" },
+    grime: { title: "Grime Scene", subtitle: "Grime and UK rap" },
+    drill: { title: "Drill Music", subtitle: "Drill beats and street anthems" },
+    "k-pop": { title: "K-Pop Wave", subtitle: "Korean pop sensations" },
+    "j-pop": { title: "J-Pop Hits", subtitle: "Japanese pop music" },
+    reggaeton: { title: "Reggaeton Flow", subtitle: "Reggaeton and Latin trap" },
+    reggae: { title: "Island Vibes", subtitle: "Reggae and tropical rhythms" },
+    jazz: { title: "Jazz Classics", subtitle: "Timeless jazz standards" },
+    classical: { title: "Classical Music", subtitle: "Masterpieces from the great composers" },
+    country: { title: "Country Roads", subtitle: "Country music and folk songs" },
+    folk: { title: "Folk & Acoustic", subtitle: "Folk music and acoustic gems" },
+    metal: { title: "Metal Mayhem", subtitle: "Heavy metal and rock extremes" },
+    punk: { title: "Punk Rock", subtitle: "Punk rock anthems" },
+    disco: { title: "Disco Fever", subtitle: "Disco hits and dance classics" },
+    funk: { title: "Funk Groove", subtitle: "Funk music and grooves" },
+    gospel: { title: "Gospel Music", subtitle: "Spiritual gospel songs" },
+    blues: { title: "Blues Legends", subtitle: "Classic blues and soulful tunes" },
+    ambient: { title: "Ambient Sounds", subtitle: "Ambient and atmospheric music" },
+    synthwave: { title: "Synthwave", subtitle: "Retro synth and 80s vibes" },
+    lofi: { title: "Lo-Fi Beats", subtitle: "Chill lo-fi hip hop" },
+    dubstep: { title: "Dubstep Drops", subtitle: "Dubstep and bass music" },
+  };
 
   // Fetch trending songs
   const {
@@ -71,67 +109,11 @@ export default function HomePage() {
     queryFn: () => artistsApi.getTop(6),
   });
 
-  // Fetch new releases (recently added songs)
-  const {
-    data: newReleases,
-    isLoading: newReleasesLoading,
-    error: newReleasesError,
-  } = useQuery({
-    queryKey: ["new-releases"],
-    queryFn: () => songsApi.getAll({ limit: 6, page: 1 }),
-  });
-
-  // Fetch discover weekly (mix of recommendations and trending)
-  const {
-    data: discoverWeekly,
-    isLoading: discoverLoading,
-    error: discoverError,
-  } = useQuery({
-    queryKey: ["discover-weekly", user?.id],
-    queryFn: async () => {
-      if (!user) return [];
-
-      // Get user recommendations
-      const userRecs = await recommendationsApi.getForUser(user.id, 3);
-
-      // Get some trending songs
-      const trending = await songsApi.getTrending(3);
-
-      // Combine and deduplicate
-      const combined = [...userRecs];
-      for (const trend of trending) {
-        if (!combined.find((rec) => rec.song.id === trend.id)) {
-          combined.push({
-            song: trend,
-            similarityScore: 0.5, // Default score for trending songs
-          });
-        }
-      }
-
-      return combined.slice(0, 6);
-    },
-    enabled: !!user,
-  });
-
-  if (
-    trendingLoading ||
-    recentLoading ||
-    recLoading ||
-    artistsLoading ||
-    newReleasesLoading ||
-    discoverLoading
-  ) {
+  if (trendingLoading || recentLoading || recLoading || artistsLoading) {
     return <LoadingSpinner />;
   }
 
-  if (
-    trendingError ||
-    recentError ||
-    recError ||
-    artistsError ||
-    newReleasesError ||
-    discoverError
-  ) {
+  if (trendingError || recentError || recError || artistsError) {
     return <ErrorMessage message="Failed to load content" />;
   }
 
@@ -262,99 +244,22 @@ export default function HomePage() {
         </section>
       )}
 
-      {/* New Releases */}
-      {newReleases && newReleases.data && newReleases.data.length > 0 && (
-        <section className="space-y-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <h2 className="text-2xl font-bold text-white mb-1">
-                New Releases
-              </h2>
-              <p className="text-gray-400 text-sm">
-                Latest songs added to our library
-              </p>
-            </div>
-            <Link
-              href="/search?sort=newest"
-              className="text-sm text-gray-400 hover:text-white transition-colors"
-            >
-              See all →
-            </Link>
-          </div>
-          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
-            {newReleases.data.slice(0, 6).map((song, index) => (
-              <SongCard key={`${song.id}-${index}`} song={song} />
-            ))}
-          </div>
-        </section>
-      )}
-
       {/* Dynamic Genre Sections */}
-      {[
-        { genre: "rock", title: "Rock Hits", subtitle: "The best rock songs" },
-        {
-          genre: "pop",
-          title: "Pop Hits",
-          subtitle: "Catchy pop songs you can't resist",
-        },
-        {
-          genre: "electronic",
-          title: "Electronic Vibes",
-          subtitle: "Electronic and dance music",
-        },
-        {
-          genre: "alternative",
-          title: "Alternative Rock",
-          subtitle: "Indie and alternative hits",
-        },
-        {
-          genre: "rnb",
-          title: "R&B Vibes",
-          subtitle: "Soulful R&B and contemporary hits",
-        },
-        {
-          genre: "jazz",
-          title: "Jazz Classics",
-          subtitle: "Timeless jazz standards",
-        },
-        {
-          genre: "hiphop",
-          title: "Hip Hop Central",
-          subtitle: "The latest hip hop tracks",
-        },
-        {
-          genre: "classical",
-          title: "Classical Music",
-          subtitle: "Masterpieces from the great composers",
-        },
-      ].map(({ genre, title, subtitle }) => (
-        <GenreSection
-          key={genre}
-          genre={genre}
-          title={title}
-          subtitle={subtitle}
-          limit={6}
-        />
-      ))}
-
-      {/* Discover Weekly */}
-      {discoverWeekly && discoverWeekly.length > 0 && (
-        <section className="space-y-4">
-          <div>
-            <h2 className="text-2xl font-bold text-white mb-1">
-              Discover Weekly
-            </h2>
-            <p className="text-gray-400 text-sm">
-              Your weekly mixtape of fresh music
-            </p>
-          </div>
-          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
-            {discoverWeekly.map((rec, index) => (
-              <SongCard key={`${rec.song.id}-${index}`} song={rec.song} />
-            ))}
-          </div>
-        </section>
-      )}
+      {MUSIC_GENRES.slice(0, 12).map((genre) => {
+        const display = genreDisplayMap[genre] || {
+          title: `${genre.charAt(0).toUpperCase() + genre.slice(1)} Music`,
+          subtitle: `Discover ${genre} tracks`,
+        };
+        return (
+          <GenreSection
+            key={genre}
+            genre={genre}
+            title={display.title}
+            subtitle={display.subtitle}
+            limit={6}
+          />
+        );
+      })}
     </div>
   );
 }

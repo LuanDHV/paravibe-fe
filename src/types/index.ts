@@ -95,12 +95,6 @@ export interface RegisterRequest {
   password: string;
 }
 
-export interface SearchFilters {
-  genre?: string;
-  artist?: string;
-  year?: number;
-}
-
 export interface PlayerState {
   currentSong: Song | null;
   isPlaying: boolean;

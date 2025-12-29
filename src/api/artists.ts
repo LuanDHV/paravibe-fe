@@ -7,7 +7,7 @@ export const artistsApi = {
     page?: number;
     limit?: number;
     genre?: string;
-    search?: string;
+    name?: string;
   }): Promise<PaginatedResponse<Artist>> => {
     const response = await api.get<ApiResponse<PaginatedResponse<Artist>>>(
       "/artists",

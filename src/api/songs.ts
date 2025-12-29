@@ -67,7 +67,7 @@ export const songsApi = {
     limit?: number;
     genre?: string;
     artist?: string;
-    search?: string;
+    title?: string;
   }): Promise<{ data: Song[]; total: number }> => {
     const response = await api.get<BackendSongsListResponse>("/songs", {
       params,
