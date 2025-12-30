@@ -87,9 +87,7 @@ export default function SearchPage() {
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <h2 className="text-xl font-semibold text-white">
-              {debouncedQuery
-                ? `Songs for "${debouncedQuery}"`
-                : "All Songs"}
+              {debouncedQuery ? `Songs for "${debouncedQuery}"` : "All Songs"}
             </h2>
             <p className="text-gray-400 text-sm">
               {searchResults.total} songs found
@@ -108,7 +106,9 @@ export default function SearchPage() {
           <h3 className="text-lg font-medium text-white mb-2">
             No results found
           </h3>
-          <p className="text-gray-400">Try searching for a different song title</p>
+          <p className="text-gray-400">
+            Try searching for a different song title
+          </p>
         </div>
       ) : (
         <div className="text-center py-12">
