@@ -1,5 +1,10 @@
 // src/types/index.ts
 
+export interface RoleObject {
+  roleId: number;
+  name: "USER" | "ADMIN";
+}
+
 export interface User {
   id?: string;
   userId?: number;
@@ -8,6 +13,8 @@ export interface User {
   avatar?: string;
   createdAt: string;
   name?: string;
+  role?: "USER" | "ADMIN" | RoleObject;
+  isActive?: number;
 }
 
 export interface Artist {

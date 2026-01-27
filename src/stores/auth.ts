@@ -2,6 +2,7 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { User, AuthTokens } from "@/types";
+import { getUserRole } from "@/lib/utils";
 
 interface AuthState {
   user: User | null;
@@ -24,8 +25,14 @@ export const useAuthStore = create<AuthState>()(
       isLoading: false,
 
       login: (user: User, tokens: AuthTokens) => {
+        // Normalize role from backend format
+        const normalizedUser: User = {
+          ...user,
+          role: getUserRole(user.role) || "USER", // Convert to "USER" | "ADMIN"
+        };
+
         set({
-          user,
+          user: normalizedUser,
           tokens,
           isAuthenticated: true,
           isLoading: false,
@@ -49,7 +56,14 @@ export const useAuthStore = create<AuthState>()(
       updateUser: (updates: Partial<User>) => {
         const currentUser = get().user;
         if (currentUser) {
-          set({ user: { ...currentUser, ...updates } });
+          // Normalize role if it's being updated
+          const normalizedUpdates = {
+            ...updates,
+            role: updates.role
+              ? getUserRole(updates.role) || "USER"
+              : currentUser.role,
+          };
+          set({ user: { ...currentUser, ...normalizedUpdates } });
         }
       },
 

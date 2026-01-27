@@ -71,3 +71,28 @@ export const autoRefreshToken = async (): Promise<void> => {
     await refreshAccessToken();
   }
 };
+
+// Extract role string from user role (handles both string and RoleObject)
+export const getUserRole = (
+  role?: string | { roleId: number; name: string }
+): "USER" | "ADMIN" | null => {
+  if (!role) return null;
+
+  // If role is a string
+  if (typeof role === "string") {
+    const upperRole = role.toUpperCase();
+    if (upperRole === "ADMIN") return "ADMIN";
+    if (upperRole === "USER") return "USER";
+    return null;
+  }
+
+  // If role is an object with name property
+  if (typeof role === "object" && "name" in role) {
+    const upperName = role.name.toUpperCase();
+    if (upperName === "ADMIN") return "ADMIN";
+    if (upperName === "USER") return "USER";
+    return null;
+  }
+
+  return null;
+};

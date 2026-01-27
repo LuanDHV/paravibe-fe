@@ -1,4 +1,4 @@
-// src/app/playlist/[id]/page.tsx
+// src/app/(user)/playlist/[id]/page.tsx
 "use client";
 
 import { useState } from "react";

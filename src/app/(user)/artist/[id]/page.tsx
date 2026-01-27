@@ -1,4 +1,4 @@
-// src/app/artist/[id]/page.tsx
+// src/app/(user)/artist/[id]/page.tsx
 "use client";
 
 import { useQuery } from "@tanstack/react-query";

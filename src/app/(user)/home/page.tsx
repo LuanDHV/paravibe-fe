@@ -1,5 +1,5 @@
 /* eslint-disable @next/next/no-img-element */
-// src/app/home/page.tsx
+// src/app/(user)/home/page.tsx
 "use client";
 
 import { useEffect } from "react";
@@ -24,8 +24,15 @@ export default function HomePage() {
   useEffect(() => {
     if (!isAuthenticated) {
       router.push("/login");
+      return;
     }
-  }, [isAuthenticated, router]);
+
+    // Redirect admin users to admin dashboard
+    if (user?.role === "ADMIN") {
+      router.push("/admin");
+      return;
+    }
+  }, [isAuthenticated, user?.role, router]);
 
   // Genre display mapping
   const genreDisplayMap: Record<string, { title: string; subtitle: string }> = {

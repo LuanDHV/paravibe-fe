@@ -2,7 +2,6 @@ export const dynamic = "force-dynamic";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import { Providers } from "@/components/providers/Providers";
-import { AppLayout } from "@/components/layout/AppLayout";
 import "./globals.css";
 
 const inter = Inter({
@@ -25,9 +24,7 @@ export default function RootLayout({
       <body
         className={`${inter.variable} font-sans antialiased bg-background text-foreground`}
       >
-        <Providers>
-          <AppLayout>{children}</AppLayout>
-        </Providers>
+        <Providers>{children}</Providers>
       </body>
     </html>
   );

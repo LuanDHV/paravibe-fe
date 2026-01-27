@@ -1,4 +1,4 @@
-// src/app/song/[id]/page.tsx
+// src/app/(user)/song/[id]/page.tsx
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
@@ -78,7 +78,7 @@ export default function SongDetailPage() {
       <div className="flex flex-col md:flex-row items-start md:items-end space-y-6 md:space-y-0 md:space-x-8">
         <div className="relative">
           <Image
-            src={song.artworkUrl || "/placeholder-album.jpg"}
+            src={song.imageUrl || "/placeholder-album.jpg"}
             alt={song.title}
             width={300}
             height={300}

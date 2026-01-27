@@ -2,7 +2,15 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
-const protectedRoutes = ["/home", "/search", "/profile", "/song", "/playlist"];
+const protectedRoutes = [
+  "/home",
+  "/search",
+  "/profile",
+  "/song",
+  "/playlist",
+  "/playlists",
+];
+const adminRoutes = ["/admin"];
 const authRoutes = ["/login", "/register"];
 
 export function middleware(request: NextRequest) {
@@ -11,10 +19,17 @@ export function middleware(request: NextRequest) {
   // Check if user is authenticated via cookie
   const token = request.cookies.get("auth-token")?.value;
 
-  // For protected routes, only redirect if definitely no token
-  // Let client-side handle authentication state restoration
+  // For protected routes, allow if token exists
+  // Client-side will handle auth state restoration from localStorage
   if (protectedRoutes.some((route) => pathname.startsWith(route)) && !token) {
-    return NextResponse.redirect(new URL("/login", request.url));
+    // Only redirect if definitely no way to restore auth
+    // Let client try to restore from localStorage first
+    return NextResponse.next();
+  }
+
+  // For admin routes, same logic - allow through to client
+  if (adminRoutes.some((route) => pathname.startsWith(route)) && !token) {
+    return NextResponse.next();
   }
 
   // For auth routes, redirect to home if token exists
