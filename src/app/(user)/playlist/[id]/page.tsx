@@ -30,6 +30,11 @@ export default function PlaylistDetailPage() {
 
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [removeConfirmDialog, setRemoveConfirmDialog] = useState<{
+    isOpen: boolean;
+    songId?: string;
+    songTitle?: string;
+  }>({ isOpen: false });
   const [editPlaylist, setEditPlaylist] = useState({
     name: "",
     description: "",
@@ -229,7 +234,13 @@ export default function PlaylistDetailPage() {
                   <Button
                     variant="ghost"
                     size="sm"
-                    onClick={() => handleRemoveSong(song.id)}
+                    onClick={() =>
+                      setRemoveConfirmDialog({
+                        isOpen: true,
+                        songId: song.id,
+                        songTitle: song.title,
+                      })
+                    }
                     className="text-white hover:text-white"
                   >
                     <Trash2 className="w-4 h-4" />
@@ -323,6 +334,48 @@ export default function PlaylistDetailPage() {
               </Button>
               <Button variant="destructive" onClick={handleDeletePlaylist}>
                 Delete
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Remove Song Confirm Dialog */}
+      <Dialog
+        open={removeConfirmDialog.isOpen}
+        onOpenChange={(isOpen) =>
+          setRemoveConfirmDialog((prev) => ({ ...prev, isOpen }))
+        }
+      >
+        <DialogContent className="max-w-sm">
+          <DialogHeader>
+            <DialogTitle className="text-red-500">Remove Song</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <p className="text-gray-300">
+              Are you sure you want to remove &quot;
+              {removeConfirmDialog.songTitle}
+              &quot; from this playlist?
+            </p>
+            <div className="flex justify-end gap-3">
+              <Button
+                variant="outline"
+                onClick={() =>
+                  setRemoveConfirmDialog((prev) => ({ ...prev, isOpen: false }))
+                }
+              >
+                Cancel
+              </Button>
+              <Button
+                variant="destructive"
+                onClick={async () => {
+                  if (removeConfirmDialog.songId) {
+                    await handleRemoveSong(removeConfirmDialog.songId);
+                    setRemoveConfirmDialog({ isOpen: false });
+                  }
+                }}
+              >
+                Remove
               </Button>
             </div>
           </div>

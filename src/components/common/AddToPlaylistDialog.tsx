@@ -29,10 +29,16 @@ export function AddToPlaylistDialog({
   const queryClient = useQueryClient();
   const [isOpen, setIsOpen] = useState(false);
 
+  // Get user ID properly - handle both string and number
+  const userId = user?.id || user?.userId;
+
   const { data: playlists, isLoading } = useQuery({
-    queryKey: ["user-playlists", user?.id],
-    queryFn: () => (user ? playlistsApi.getUserPlaylists(user.id) : []),
-    enabled: !!user && isOpen,
+    queryKey: ["user-playlists", userId],
+    queryFn: () => {
+      console.log("Fetching playlists for userId:", userId);
+      return userId ? playlistsApi.getUserPlaylists(String(userId)) : [];
+    },
+    enabled: !!userId && isOpen,
   });
 
   const addToPlaylistMutation = useMutation({

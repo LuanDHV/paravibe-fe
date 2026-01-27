@@ -141,7 +141,7 @@ export default function HomePage() {
     queryKey: ["user-recommendations", user?.userId || user?.id],
     queryFn: () =>
       user
-        ? recommendationsApi.getForUser(String(user.userId || user.id), 6)
+        ? recommendationsApi.getForUser(String(user.userId || user.id), 10)
         : Promise.resolve([]),
     enabled: !!user && !!(user.userId || user.id),
   });

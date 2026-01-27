@@ -25,6 +25,10 @@ export default function AdminUsersPage() {
   const [editName, setEditName] = useState("");
   const [editEmail, setEditEmail] = useState("");
   const [editRole, setEditRole] = useState("");
+  const [deleteConfirm, setDeleteConfirm] = useState<{
+    userId: string | number;
+    userName: string;
+  } | null>(null);
 
   // Fetch users
   const {
@@ -258,7 +262,12 @@ export default function AdminUsersPage() {
                             size="sm"
                             variant="ghost"
                             className="hover:bg-red-500/20 text-red-400 hover:text-red-300"
-                            onClick={() => deleteMutation.mutate(userId)}
+                            onClick={() =>
+                              setDeleteConfirm({
+                                userId,
+                                userName: user.name || user.email || "User",
+                              })
+                            }
                             disabled={deleteMutation.isPending}
                           >
                             <Trash2 className="h-4 w-4 mr-2" />
@@ -388,6 +397,59 @@ export default function AdminUsersPage() {
               </Button>
               <Button
                 onClick={() => setEditingUser(null)}
+                variant="outline"
+                className="flex-1 border-white/10"
+              >
+                Cancel
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Confirmation Dialog */}
+      {deleteConfirm && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-black/80 border border-white/10 rounded-xl p-8 max-w-md w-full mx-4 space-y-6">
+            <div className="flex justify-between items-center">
+              <h2 className="text-2xl font-bold text-white">Confirm Delete</h2>
+              <button
+                onClick={() => setDeleteConfirm(null)}
+                className="text-gray-400 hover:text-white"
+              >
+                <X className="h-6 w-6" />
+              </button>
+            </div>
+
+            <div className="space-y-4">
+              <p className="text-gray-300">
+                Are you sure you want to delete user{" "}
+                <span className="font-semibold text-white">
+                  &quot;{deleteConfirm.userName}&quot;
+                </span>
+                ? This action cannot be undone.
+              </p>
+
+              <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-3">
+                <p className="text-sm text-red-300">
+                  ⚠️ All associated data will be removed.
+                </p>
+              </div>
+            </div>
+
+            <div className="flex gap-3">
+              <Button
+                onClick={() => {
+                  deleteMutation.mutate(deleteConfirm.userId);
+                  setDeleteConfirm(null);
+                }}
+                disabled={deleteMutation.isPending}
+                className="flex-1 bg-red-600 hover:bg-red-700"
+              >
+                {deleteMutation.isPending ? "Deleting..." : "Delete"}
+              </Button>
+              <Button
+                onClick={() => setDeleteConfirm(null)}
                 variant="outline"
                 className="flex-1 border-white/10"
               >
