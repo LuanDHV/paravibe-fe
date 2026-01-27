@@ -22,8 +22,10 @@ export default function AdminLayout({
     const timer = setTimeout(() => {
       if (!user) {
         router.push("/login");
+        setIsReady(false);
       } else if (user.role !== "ADMIN") {
         router.push("/home");
+        setIsReady(false);
       } else {
         setIsReady(true);
       }
@@ -83,12 +85,14 @@ export default function AdminLayout({
         </nav>
 
         <div className="p-4 border-t border-white/10 space-y-2">
-          <div className="px-3 py-2 rounded-lg bg-white/5">
-            <p className="text-xs text-gray-400">Logged in as</p>
-            <p className="text-sm font-semibold text-white truncate">
-              {user.name || user.email}
-            </p>
-          </div>
+          {user && (
+            <div className="px-3 py-2 rounded-lg bg-white/5">
+              <p className="text-xs text-gray-400">Logged in as</p>
+              <p className="text-sm font-semibold text-white truncate">
+                {user.name || user.email}
+              </p>
+            </div>
+          )}
           <Button
             variant="ghost"
             className="w-full justify-start text-red-400 hover:bg-red-500/10 hover:text-red-300"

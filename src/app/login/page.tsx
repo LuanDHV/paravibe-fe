@@ -44,12 +44,9 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="fixed inset-0 h-screen w-screen overflow-hidden bg-linear-to-br from-purple-900 via-blue-900 to-indigo-900 flex items-center justify-center">
-      {/* Animated background elements */}
-      <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute top-0 -right-1/3 w-1/2 h-1/2 bg-purple-500/20 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute bottom-0 -left-1/3 w-1/2 h-1/2 bg-blue-500/20 rounded-full blur-3xl animate-pulse"></div>
-      </div>
+    <div className="fixed inset-0 h-screen w-screen overflow-hidden flex items-center justify-center bg-[url('/imgs/M5.jpg')] bg-cover bg-center bg-no-repeat">
+      {/* Dark overlay */}
+      <div className="absolute inset-0 bg-black/60 z-0"></div>
 
       {/* Login Form */}
       <div className="relative z-10 w-full max-w-md px-6 mx-auto">

@@ -94,11 +94,8 @@ export default function AdminSongsPage() {
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-4xl font-bold text-white">Song Management</h1>
-          <p className="text-gray-400 mt-2">Manage songs in your library</p>
+          <p className="text-gray-400 mt-2">Manage songs</p>
         </div>
-        <Button className="bg-purple-600 hover:bg-purple-700">
-          Add New Song
-        </Button>
       </div>
 
       {/* Loading State */}
@@ -129,13 +126,13 @@ export default function AdminSongsPage() {
                     Genre
                   </th>
                   <th className="text-left px-6 py-4 text-gray-400 font-semibold">
+                    Release Date
+                  </th>
+                  <th className="text-left px-6 py-4 text-gray-400 font-semibold">
                     Duration
                   </th>
                   <th className="text-left px-6 py-4 text-gray-400 font-semibold">
                     Added
-                  </th>
-                  <th className="text-right px-6 py-4 text-gray-400 font-semibold">
-                    Actions
                   </th>
                 </tr>
               </thead>
@@ -173,6 +170,11 @@ export default function AdminSongsPage() {
                           {song.genre || "N/A"}
                         </td>
                         <td className="px-6 py-4 text-gray-400">
+                          {song.releaseDate
+                            ? new Date(song.releaseDate).toLocaleDateString()
+                            : "N/A"}
+                        </td>
+                        <td className="px-6 py-4 text-gray-400">
                           {song.duration
                             ? `${Math.floor(song.duration / 60)}:${String(
                                 song.duration % 60
@@ -184,31 +186,12 @@ export default function AdminSongsPage() {
                             ? new Date(song.createdAt).toLocaleDateString()
                             : "N/A"}
                         </td>
-                        <td className="px-6 py-4 text-right space-x-2 flex justify-end">
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            className="hover:bg-blue-500/20 text-blue-400 hover:text-blue-300"
-                            onClick={() => handleEditClick(song)}
-                          >
-                            <Edit2 className="h-4 w-4" />
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            className="hover:bg-red-500/20 text-red-400 hover:text-red-300"
-                            onClick={() => deleteMutation.mutate(songId)}
-                            disabled={deleteMutation.isPending}
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        </td>
                       </tr>
                     );
                   })
                 ) : (
                   <tr>
-                    <td colSpan={7} className="px-6 py-12 text-center">
+                    <td colSpan={8} className="px-6 py-12 text-center">
                       <Music className="h-12 w-12 text-gray-400 mx-auto mb-4 opacity-50" />
                       <p className="text-gray-400">No songs found</p>
                     </td>
