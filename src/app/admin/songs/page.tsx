@@ -141,68 +141,68 @@ export default function AdminSongsPage() {
               <tbody>
                 {songsData?.data && songsData.data.length > 0 ? (
                   songsData.data.map((song, index) => {
-                    const songId = song.id || (index + 1);
+                    const songId = song.id || index + 1;
                     return (
-                    <tr
-                      key={String(songId)}
-                      className="border-b border-white/5 hover:bg-white/5 transition-colors"
-                    >
-                      <td className="px-6 py-4">
-                        <div className="w-12 h-12 bg-black/50 border border-white/10 rounded flex items-center justify-center overflow-hidden">
-                          {song.imageUrl ? (
-                            <Image
-                              src={song.imageUrl}
-                              alt={song.title || "Song cover"}
-                              width={48}
-                              height={48}
-                              className="object-cover w-full h-full"
-                            />
-                          ) : (
-                            <Music className="h-6 w-6 text-gray-400" />
-                          )}
-                        </div>
-                      </td>
-                      <td className="px-6 py-4">
-                        <p className="font-medium text-white">{song.title}</p>
-                      </td>
-                      <td className="px-6 py-4 text-gray-300">
-                        {song.artist?.name || "Unknown"}
-                      </td>
-                      <td className="px-6 py-4 text-gray-300">
-                        {song.genre || "N/A"}
-                      </td>
-                      <td className="px-6 py-4 text-gray-400">
-                        {song.duration
-                          ? `${Math.floor(song.duration / 60)}:${String(
-                              song.duration % 60
-                            ).padStart(2, "0")}`
-                          : "N/A"}
-                      </td>
-                      <td className="px-6 py-4 text-gray-400">
-                        {song.createdAt
-                          ? new Date(song.createdAt).toLocaleDateString()
-                          : "N/A"}
-                      </td>
-                      <td className="px-6 py-4 text-right space-x-2 flex justify-end">
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          className="hover:bg-blue-500/20 text-blue-400 hover:text-blue-300"
-                          onClick={() => handleEditClick(song)}
-                        >
-                          <Edit2 className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          className="hover:bg-red-500/20 text-red-400 hover:text-red-300"
-                          onClick={() => deleteMutation.mutate(songId)}
-                          disabled={deleteMutation.isPending}
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </td>
-                    </tr>
+                      <tr
+                        key={String(songId)}
+                        className="border-b border-white/5 hover:bg-white/5 transition-colors"
+                      >
+                        <td className="px-6 py-4">
+                          <div className="w-12 h-12 bg-black/50 border border-white/10 rounded flex items-center justify-center overflow-hidden">
+                            {song.imageUrl ? (
+                              <Image
+                                src={song.imageUrl}
+                                alt={song.title || "Song cover"}
+                                width={48}
+                                height={48}
+                                className="object-cover w-full h-full"
+                              />
+                            ) : (
+                              <Music className="h-6 w-6 text-gray-400" />
+                            )}
+                          </div>
+                        </td>
+                        <td className="px-6 py-4">
+                          <p className="font-medium text-white">{song.title}</p>
+                        </td>
+                        <td className="px-6 py-4 text-gray-300">
+                          {song.artist?.name || "Unknown"}
+                        </td>
+                        <td className="px-6 py-4 text-gray-300">
+                          {song.genre || "N/A"}
+                        </td>
+                        <td className="px-6 py-4 text-gray-400">
+                          {song.duration
+                            ? `${Math.floor(song.duration / 60)}:${String(
+                                song.duration % 60
+                              ).padStart(2, "0")}`
+                            : "N/A"}
+                        </td>
+                        <td className="px-6 py-4 text-gray-400">
+                          {song.createdAt
+                            ? new Date(song.createdAt).toLocaleDateString()
+                            : "N/A"}
+                        </td>
+                        <td className="px-6 py-4 text-right space-x-2 flex justify-end">
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            className="hover:bg-blue-500/20 text-blue-400 hover:text-blue-300"
+                            onClick={() => handleEditClick(song)}
+                          >
+                            <Edit2 className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            className="hover:bg-red-500/20 text-red-400 hover:text-red-300"
+                            onClick={() => deleteMutation.mutate(songId)}
+                            disabled={deleteMutation.isPending}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </td>
+                      </tr>
                     );
                   })
                 ) : (

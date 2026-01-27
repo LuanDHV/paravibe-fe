@@ -82,7 +82,8 @@ export default function AdminUsersPage() {
 
   const handleEditClick = (user: any) => {
     const userId = user.id || user.userId;
-    const userRole = typeof user.role === "string" ? user.role : (user.role?.name || "USER");
+    const userRole =
+      typeof user.role === "string" ? user.role : user.role?.name || "USER";
     console.log("Edit user clicked:", { user, userId, userRole });
     setEditingUser({
       id: userId || "",
@@ -192,8 +193,10 @@ export default function AdminUsersPage() {
                         </td>
                         <td className="px-6 py-4">
                           {(() => {
-                            const isAdmin = user.role === "ADMIN" || 
-                              (typeof user.role === 'object' && user.role.name === "ADMIN");
+                            const isAdmin =
+                              user.role === "ADMIN" ||
+                              (typeof user.role === "object" &&
+                                user.role.name === "ADMIN");
                             return (
                               <span
                                 className={`px-3 py-1 rounded-full text-xs font-semibold ${
