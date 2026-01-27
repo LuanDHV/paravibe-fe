@@ -3,8 +3,8 @@ import axios from "axios";
 import { useAuthStore } from "@/stores/auth";
 import { refreshAccessToken, shouldRefreshToken } from "@/lib/utils";
 
-const API_BASE_URL = "http://localhost:8080/api/v1";
-const AI_API_BASE_URL = "http://localhost:8000/api/v1";
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
+const AI_API_BASE_URL = process.env.NEXT_PUBLIC_AI_API_BASE_URL;
 
 // Create axios instance
 export const api = axios.create({
