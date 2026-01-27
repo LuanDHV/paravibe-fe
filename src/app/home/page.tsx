@@ -117,10 +117,12 @@ export default function HomePage() {
     isLoading: recentLoading,
     error: recentError,
   } = useQuery({
-    queryKey: ["recent-songs", user?.id],
+    queryKey: ["recent-songs", user?.userId || user?.id],
     queryFn: () =>
-      user ? songsApi.getRecentlyPlayed(user.id, 6) : Promise.resolve([]),
-    enabled: !!user,
+      user
+        ? songsApi.getRecentlyPlayed(String(user.userId || user.id), 6)
+        : Promise.resolve([]),
+    enabled: !!user && !!(user.userId || user.id),
   });
 
   // Fetch user recommendations
@@ -129,10 +131,12 @@ export default function HomePage() {
     isLoading: recLoading,
     error: recError,
   } = useQuery({
-    queryKey: ["user-recommendations", user?.id],
+    queryKey: ["user-recommendations", user?.userId || user?.id],
     queryFn: () =>
-      user ? recommendationsApi.getForUser(user.id, 6) : Promise.resolve([]),
-    enabled: !!user,
+      user
+        ? recommendationsApi.getForUser(String(user.userId || user.id), 6)
+        : Promise.resolve([]),
+    enabled: !!user && !!(user.userId || user.id),
   });
 
   // Fetch top artists

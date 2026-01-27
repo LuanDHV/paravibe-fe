@@ -1,6 +1,7 @@
 // src/app/profile/page.tsx
 "use client";
 
+import { useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Calendar, Clock, Music, TrendingUp } from "lucide-react";
 import { useAuthStore } from "@/stores/auth";
@@ -8,6 +9,7 @@ import { historyApi } from "@/api/history";
 import { playlistsApi } from "@/api/playlists";
 import { songsApi } from "@/api/songs";
 import { recommendationsApi } from "@/api/recommendations";
+import { authApi } from "@/api/auth";
 import { LoadingSpinner } from "@/components/common/LoadingSpinner";
 import { ErrorMessage } from "@/components/common/ErrorMessage";
 import { SongCard } from "@/components/common/SongCard";
@@ -16,27 +18,49 @@ import { RecommendationSection } from "@/components/common/RecommendationSection
 export default function ProfilePage() {
   const { user } = useAuthStore();
 
+  // Reload user profile on mount to ensure userId is set
+  useEffect(() => {
+    const loadUserProfile = async () => {
+      try {
+        const profile = await authApi.getProfile();
+        if (profile) {
+          useAuthStore.getState().updateUser(profile);
+        }
+      } catch (error) {
+        console.error("Failed to load user profile:", error);
+      }
+    };
+
+    if (user && !user.userId) {
+      loadUserProfile();
+    }
+  }, [user]);
+
+  const userId = user?.userId || user?.id;
+
   const {
     data: history,
     isLoading: historyLoading,
     error: historyError,
   } = useQuery({
-    queryKey: ["user-history", user?.id],
-    queryFn: () => (user ? historyApi.getUserHistory(user.id) : []),
-    enabled: !!user,
+    queryKey: ["user-history", userId],
+    queryFn: () => (userId ? historyApi.getUserHistory(String(userId)) : []),
+    enabled: !!userId,
   });
 
   const { data: playlists, isLoading: playlistsLoading } = useQuery({
-    queryKey: ["user-playlists", user?.id],
-    queryFn: () => (user ? playlistsApi.getUserPlaylists(user.id) : []),
-    enabled: !!user,
+    queryKey: ["user-playlists", userId],
+    queryFn: () =>
+      userId ? playlistsApi.getUserPlaylists(String(userId)) : [],
+    enabled: !!userId,
   });
 
   // Fetch AI recommendations for user
   const { data: aiRecommendations, isLoading: aiRecLoading } = useQuery({
-    queryKey: ["ai-recommendations", user?.id],
-    queryFn: () => (user ? recommendationsApi.getForUser(user.id, 20) : []),
-    enabled: !!user,
+    queryKey: ["ai-recommendations", userId],
+    queryFn: () =>
+      userId ? recommendationsApi.getForUser(String(userId), 20) : [],
+    enabled: !!userId,
   });
 
   const recentSongIds = history
@@ -101,12 +125,12 @@ export default function ProfilePage() {
         <div className="flex items-center space-x-4">
           <div className="w-20 h-20 bg-linear-to-r from-purple-500 to-blue-500 rounded-full flex items-center justify-center">
             <span className="text-white text-2xl font-bold">
-              {user.username.charAt(0).toUpperCase()}
+              {(user.name || user.username || "U").charAt(0).toUpperCase()}
             </span>
           </div>
           <div>
             <h2 className="text-2xl font-semibold text-white">
-              {user.username}
+              {user.name || user.username}
             </h2>
             <p className="text-gray-400">{user.email}</p>
             <p className="text-sm text-gray-500">

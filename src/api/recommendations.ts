@@ -8,8 +8,13 @@ export const recommendationsApi = {
     userId: string,
     limit: number = 20
   ): Promise<Recommendation[]> => {
+    const parsedId = parseInt(userId, 10);
+    if (isNaN(parsedId)) {
+      console.warn("Invalid userId:", userId);
+      return [];
+    }
     const response = await api.get<AIRecSong[]>(
-      `/recommendations/user/${parseInt(userId, 10)}`,
+      `/recommendations/user/${parsedId}`,
       {
         params: { topK: limit },
       }

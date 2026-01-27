@@ -81,7 +81,12 @@ function adaptPlaylistSong(backendSong: BackendPlaylistSongResponse): Song {
 
 export const playlistsApi = {
   getUserPlaylists: async (userId: string): Promise<Playlist[]> => {
-    const response = await api.get(`/playlists/user/${parseInt(userId, 10)}`);
+    const parsedId = parseInt(userId, 10);
+    if (isNaN(parsedId)) {
+      console.warn("Invalid userId:", userId);
+      return [];
+    }
+    const response = await api.get(`/playlists/user/${parsedId}`);
     const playlists = response.data.data || response.data || [];
     return Array.isArray(playlists)
       ? playlists.map((playlist: BackendPlaylistResponse) =>

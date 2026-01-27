@@ -56,10 +56,12 @@ export function Header() {
             <Avatar className="h-8 w-8">
               <AvatarImage src={user.avatar} />
               <AvatarFallback>
-                {user.username.charAt(0).toUpperCase()}
+                {(user.name || user.username || "U").charAt(0).toUpperCase()}
               </AvatarFallback>
             </Avatar>
-            <span className="text-sm font-medium">{user.username}</span>
+            <span className="text-sm font-medium">
+              {user.name || user.username}
+            </span>
             <Button variant="ghost" size="sm" onClick={handleLogout}>
               Logout
             </Button>

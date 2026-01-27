@@ -45,9 +45,10 @@ export default function PlaylistsPage() {
     error,
     refetch,
   } = useQuery({
-    queryKey: ["user-playlists", user?.id],
-    queryFn: () => (user ? playlistsApi.getUserPlaylists(user.id) : []),
-    enabled: !!user,
+    queryKey: ["user-playlists", user?.userId || user?.id],
+    queryFn: () =>
+      user ? playlistsApi.getUserPlaylists(String(user.userId || user.id)) : [],
+    enabled: !!user && !!(user.userId || user.id),
   });
 
   const handleCreatePlaylist = async () => {

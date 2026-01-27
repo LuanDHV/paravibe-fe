@@ -98,8 +98,13 @@ export const songsApi = {
     userId: string,
     limit: number = 20
   ): Promise<Song[]> => {
+    const parsedId = parseInt(userId, 10);
+    if (isNaN(parsedId)) {
+      console.warn("Invalid userId:", userId);
+      return [];
+    }
     const response = await api.get<BackendSongResponse[]>(
-      `/users/${parseInt(userId, 10)}/history`,
+      `/users/${parsedId}/history`,
       {
         params: { limit },
       }

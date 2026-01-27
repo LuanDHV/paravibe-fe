@@ -11,13 +11,14 @@ export const historyApi = {
     // Get user from auth store instead of localStorage
     const authData = JSON.parse(localStorage.getItem("auth-storage") || "{}");
     const user = authData?.state?.user;
-    if (!user?.id) {
+    const userId = user?.userId || user?.id;
+    if (!userId) {
       console.warn("No user found for history tracking");
       return;
     }
 
     try {
-      await api.post(`/users/${user.id}/history`, {
+      await api.post(`/users/${userId}/history`, {
         songId: parseInt(data.songId, 10),
         durationListened: data.duration || 0,
         action: data.action,
@@ -33,7 +34,12 @@ export const historyApi = {
     userId: string,
     limit: number = 50
   ): Promise<HistoryItem[]> => {
-    const response = await api.get(`/users/${parseInt(userId, 10)}/history`, {
+    const parsedId = parseInt(userId, 10);
+    if (isNaN(parsedId)) {
+      console.warn("Invalid userId:", userId);
+      return [];
+    }
+    const response = await api.get(`/users/${parsedId}/history`, {
       params: { limit },
     });
     return response.data.data || response.data || [];
@@ -43,12 +49,14 @@ export const historyApi = {
     userId: string,
     limit: number = 10
   ): Promise<TopSong[]> => {
-    const response = await api.get(
-      `/users/${parseInt(userId, 10)}/history/top-songs/all`,
-      {
-        params: { limit },
-      }
-    );
+    const parsedId = parseInt(userId, 10);
+    if (isNaN(parsedId)) {
+      console.warn("Invalid userId:", userId);
+      return [];
+    }
+    const response = await api.get(`/users/${parsedId}/history/top-songs/all`, {
+      params: { limit },
+    });
     return response.data.data || response.data || [];
   },
 };

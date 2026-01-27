@@ -13,7 +13,7 @@ import { RegisterRequest } from "@/types";
 export default function RegisterPage() {
   const [formData, setFormData] = useState<RegisterRequest>({
     email: "",
-    username: "",
+    name: "",
     password: "",
   });
   const [isLoading, setIsLoading] = useState(false);
@@ -46,73 +46,84 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-linear-to-br from-purple-900 via-blue-900 to-indigo-900">
-      <div className="bg-black/20 backdrop-blur-lg p-8 rounded-lg shadow-2xl w-full max-w-md">
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-white mb-2">ParaVibe</h1>
-          <p className="text-gray-300">Create your account</p>
-        </div>
+    <div className="fixed inset-0 h-screen w-screen overflow-hidden bg-linear-to-br from-purple-900 via-blue-900 to-indigo-900 flex items-center justify-center">
+      {/* Animated background elements */}
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute top-0 -right-1/3 w-1/2 h-1/2 bg-purple-500/20 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute bottom-0 -left-1/3 w-1/2 h-1/2 bg-blue-500/20 rounded-full blur-3xl animate-pulse"></div>
+      </div>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <div>
-            <Input
-              type="email"
-              name="email"
-              placeholder="Email"
-              value={formData.email}
-              onChange={handleChange}
-              required
-              className="bg-white/10 border-white/20 text-white placeholder:text-gray-400"
-            />
+      {/* Register Form */}
+      <div className="relative z-10 w-full max-w-md px-6 mx-auto">
+        <div className="bg-black/30 backdrop-blur-xl border border-white/10 rounded-2xl p-8 shadow-2xl">
+          <div className="text-center mb-8">
+            <h1 className="text-4xl font-bold text-white mb-2">ParaVibe</h1>
+            <p className="text-gray-300 text-sm">Create your account</p>
           </div>
 
-          <div>
-            <Input
-              type="text"
-              name="username"
-              placeholder="Username"
-              value={formData.username}
-              onChange={handleChange}
-              required
-              className="bg-white/10 border-white/20 text-white placeholder:text-gray-400"
-            />
-          </div>
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div>
+              <Input
+                type="email"
+                name="email"
+                placeholder="Email"
+                value={formData.email}
+                onChange={handleChange}
+                required
+                className="bg-white/10 border border-white/20 text-white placeholder:text-gray-400 rounded-lg h-12 px-4 transition-all focus:border-purple-500/50 focus:bg-white/15"
+              />
+            </div>
 
-          <div>
-            <Input
-              type="password"
-              name="password"
-              placeholder="Password"
-              value={formData.password}
-              onChange={handleChange}
-              required
-              className="bg-white/10 border-white/20 text-white placeholder:text-gray-400"
-            />
-          </div>
+            <div>
+              <Input
+                type="text"
+                name="name"
+                placeholder="Full Name"
+                value={formData.name}
+                onChange={handleChange}
+                required
+                className="bg-white/10 border border-white/20 text-white placeholder:text-gray-400 rounded-lg h-12 px-4 transition-all focus:border-purple-500/50 focus:bg-white/15"
+              />
+            </div>
 
-          {error && (
-            <div className="text-red-400 text-sm text-center">{error}</div>
-          )}
+            <div>
+              <Input
+                type="password"
+                name="password"
+                placeholder="Password"
+                value={formData.password}
+                onChange={handleChange}
+                required
+                className="bg-white/10 border border-white/20 text-white placeholder:text-gray-400 rounded-lg h-12 px-4 transition-all focus:border-purple-500/50 focus:bg-white/15"
+              />
+            </div>
 
-          <Button
-            type="submit"
-            disabled={isLoading}
-            className="w-full bg-linear-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600"
-          >
-            {isLoading ? "Creating account..." : "Sign Up"}
-          </Button>
-        </form>
+            {error && (
+              <div className="bg-red-500/20 border border-red-500/50 rounded-lg p-3 text-red-300 text-sm text-center">
+                {error}
+              </div>
+            )}
 
-        <div className="text-center mt-6">
-          <p className="text-gray-300">
-            Already have an account?{" "}
-            <Link
-              href="/login"
-              className="text-purple-400 hover:text-purple-300"
+            <Button
+              type="submit"
+              disabled={isLoading}
+              className="w-full h-12 bg-linear-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 text-white font-semibold rounded-lg transition-all transform hover:scale-105 active:scale-95 disabled:opacity-70"
             >
-              Sign in
-            </Link>
-          </p>
+              {isLoading ? "Creating account..." : "Sign Up"}
+            </Button>
+          </form>
+
+          <div className="text-center mt-8 pt-6 border-t border-white/10">
+            <p className="text-gray-300 text-sm">
+              Already have an account?{" "}
+              <Link
+                href="/login"
+                className="text-purple-400 hover:text-purple-300 font-semibold transition-colors"
+              >
+                Sign in
+              </Link>
+            </p>
+          </div>
         </div>
       </div>
     </div>

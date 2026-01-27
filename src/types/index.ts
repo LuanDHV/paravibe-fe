@@ -1,12 +1,12 @@
 // src/types/index.ts
 
 export interface User {
-  id: string;
+  id?: string;
+  userId?: number;
   email: string;
-  username: string;
+  username?: string;
   avatar?: string;
   createdAt: string;
-  userId?: number;
   name?: string;
 }
 
@@ -91,7 +91,7 @@ export interface LoginRequest {
 
 export interface RegisterRequest {
   email: string;
-  username: string;
+  name: string;
   password: string;
 }
 
